@@ -427,16 +427,43 @@
       --muted: #9a9088;
     }
 
-    .dark-toggle {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 100px;
-      transition: background 0.2s, color 0.2s;
-    }
+    .theme-toggle {
+  position: relative;
+  display: inline-block;
+  width: 64px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.theme-toggle input { display: none; }
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 100px;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  font-size: 0.85rem;
+}
+
+.slider::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--ink);
+  border-radius: 50%;
+  left: 4px;
+  transition: transform 0.3s;
+}
+
+input:checked ~ .slider::after {
+  transform: translateX(32px);
+}
     .dark-toggle:hover { background: var(--ink); color: var(--cream); }
 
   </style>
@@ -451,7 +478,13 @@
       <li><a href="#work">Work</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <button class="dark-toggle" onclick="document.body.classList.toggle('dark')">🌙</button>
+      <label class="theme-toggle">
+        <input type="checkbox" id="theme-checkbox">
+        <span class="slider">
+          <span class="sun">☀️</span>
+          <span class="moon">🌙</span>
+        </span>
+      </label>
   </nav>
 
   <!-- HERO -->
@@ -585,11 +618,16 @@
   </script>
 
   <script>
-    if (localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
-    document.querySelector('.dark-toggle').addEventListener('click', () => {
-      localStorage.setItem('dark', document.body.classList.contains('dark'));
-    });
-  </script>
+  const checkbox = document.getElementById('theme-checkbox');
+  if (localStorage.getItem('dark') === 'true') {
+    document.body.classList.add('dark');
+    checkbox.checked = true;
+  }
+  checkbox.addEventListener('change', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('dark', document.body.classList.contains('dark'));
+  });
+</script>
 
 </body>
 </html>
