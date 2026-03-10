@@ -440,7 +440,7 @@
 .slider {
   position: absolute;
   inset: 0;
-  background: var(--border);
+  background: #c8441a;
   border-radius: 100px;
   transition: background 0.3s;
   display: flex;
@@ -448,6 +448,10 @@
   justify-content: space-between;
   padding: 0 6px;
   font-size: 0.85rem;
+}
+
+body.dark .slider {
+  background: #2a3a5c;
 }
 
 .sun { opacity: 1; transition: opacity 0.3s; }
