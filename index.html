@@ -450,6 +450,12 @@
   font-size: 0.85rem;
 }
 
+.sun { opacity: 1; transition: opacity 0.3s; }
+.moon { opacity: 0.4; transition: opacity 0.3s; }
+
+input:checked ~ .slider .sun { opacity: 0.4; }
+input:checked ~ .slider .moon { opacity: 1; }
+
 .slider::after {
   content: '';
   position: absolute;
