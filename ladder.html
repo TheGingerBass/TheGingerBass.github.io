@@ -598,15 +598,12 @@ const PUZZLES = [
 ];
 
 // ── SEED PUZZLE FROM DATE ──
-function getPuzzle() {
-  const now = new Date();
-  const start = new Date(2026, 0, 1);
-  const dayNum = Math.floor((now - start) / 86400000);
-  return { puzzle: PUZZLES[dayNum % PUZZLES.length], dayNum };
-}
+const _today = new Date();
+const _start = new Date(2026, 0, 1);
+const dayNum = Math.floor((_today - _start) / 86400000);
+const puzzle = PUZZLES[dayNum % PUZZLES.length];
 
 // ── STATE ──
-let { puzzle, dayNum } = getPuzzle();
 let chain = [puzzle.start];
 let steps = 0;
 let won = false;
@@ -619,9 +616,8 @@ document.getElementById('stat-par').textContent = puzzle.par;
 document.getElementById('par-display').textContent = puzzle.par;
 
 // Date display
-const now = new Date();
 document.getElementById('puzzle-date').textContent =
-  now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+  _today.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 document.getElementById('puzzle-num').textContent = `#${dayNum + 1}`;
 
 // ── RENDER CHAIN ──
@@ -810,9 +806,9 @@ function handleWin() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0,0,0,0);
-  const diff = tomorrow - new Date();
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
+  const msLeft = tomorrow - new Date();
+  const h = Math.floor(msLeft / 3600000);
+  const m = Math.floor((msLeft % 3600000) / 60000);
   document.getElementById('next-puzzle').textContent = `Next puzzle in ${h}h ${m}m`;
 
   document.getElementById('win-panel').classList.add('visible');
