@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --cream: #f5f0e8;
       --ink: #1a1714;
@@ -15,15 +14,7 @@
       --muted: #7a7269;
       --border: #d8d0c4;
       --green: #3a7d44;
-      --green-bg: rgba(58,125,68,0.1);
-      --red: #c8441a;
-      --red-bg: rgba(200,68,26,0.1);
-      --yellow: #b58a00;
-      --yellow-bg: rgba(181,138,0,0.1);
     }
-
-    html { scroll-behavior: smooth; }
-
     body {
       background: var(--cream);
       color: var(--ink);
@@ -33,7 +24,6 @@
       display: flex;
       flex-direction: column;
     }
-
     body::before {
       content: '';
       position: fixed;
@@ -43,10 +33,8 @@
       z-index: 0;
       opacity: 0.4;
     }
-
     * { position: relative; z-index: 1; }
 
-    /* ── HEADER ── */
     header {
       border-bottom: 1px solid var(--border);
       padding: 1.25rem 2rem;
@@ -54,508 +42,130 @@
       justify-content: space-between;
       align-items: center;
     }
-
-    .back-link {
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
+    .back-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
     .back-link:hover { color: var(--rust); }
-
-    .game-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.8rem;
-      letter-spacing: -0.02em;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
+    .game-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; letter-spacing: -0.02em; position: absolute; left: 50%; transform: translateX(-50%); }
     .game-title em { font-style: italic; color: var(--rust); }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .how-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.4rem 0.9rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .how-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.9rem; cursor: pointer; }
     .how-btn:hover { border-color: var(--ink); color: var(--ink); }
 
-    /* ── MAIN ── */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2.5rem 1.5rem;
-      gap: 1.5rem;
-      max-width: 520px;
-      margin: 0 auto;
-      width: 100%;
-    }
+    main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1.5rem; gap: 1.5rem; max-width: 520px; margin: 0 auto; width: 100%; }
 
-    /* ── PUZZLE INFO ── */
-    .puzzle-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+    .puzzle-info { display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .par-badge { border: 1px solid var(--border); padding: 0.3rem 0.8rem; font-size: 0.72rem; }
+    .par-badge strong { font-weight: 500; color: var(--ink); }
 
-    .par-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      border: 1px solid var(--border);
-      padding: 0.3rem 0.8rem;
-      font-size: 0.72rem;
-    }
-
-    .par-badge strong {
-      font-weight: 500;
-      color: var(--ink);
-    }
-
-    /* ── WORD DISPLAY ── */
-    .word-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      width: 100%;
-    }
-
-    .word-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      width: 100%;
-      padding: 0.6rem 0;
-      border-bottom: 1px solid var(--border);
-      animation: fadeIn 0.3s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
+    .word-display { display: flex; flex-direction: column; align-items: center; width: 100%; }
+    .word-row { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
     .word-row:first-child { border-top: 1px solid var(--border); }
+    .step-num { font-size: 0.68rem; color: var(--muted); width: 1.5rem; text-align: right; flex-shrink: 0; }
+    .word-letters { display: flex; gap: 4px; flex: 1; }
+    .letter-box { width: 2.2rem; height: 2.2rem; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 1.1rem; text-transform: uppercase; }
+    .is-start   { background: var(--rust);  color: var(--cream); border-color: var(--rust); }
+    .is-end     { background: var(--green); color: var(--cream); border-color: var(--green); }
+    .is-changed { background: var(--ink);   color: var(--cream); border-color: var(--ink); }
+    .word-label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); width: 3.5rem; flex-shrink: 0; }
+    .is-target-label { color: var(--green); }
+    .connector { width: 1px; height: 8px; background: var(--border); margin-left: 3.25rem; }
 
-    .step-num {
-      font-size: 0.68rem;
-      color: var(--muted);
-      width: 1.5rem;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .word-letters {
-      display: flex;
-      gap: 4px;
-      flex: 1;
-    }
-
-    .letter-box {
-      width: 2.2rem;
-      height: 2.2rem;
-      border: 1.5px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.1rem;
-      text-transform: uppercase;
-      transition: all 0.15s;
-    }
-
-    .letter-box.changed {
-      background: var(--ink);
-      color: var(--cream);
-      border-color: var(--ink);
-    }
-
-    .letter-box.start {
-      background: var(--rust);
-      color: var(--cream);
-      border-color: var(--rust);
-    }
-
-    .letter-box.end-word {
-      background: var(--green);
-      color: var(--cream);
-      border-color: var(--green);
-    }
-
-    .word-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      width: 3rem;
-      flex-shrink: 0;
-    }
-
-    .word-label.target { color: var(--green); }
-
-    /* ── CONNECTOR ── */
-    .connector {
-      width: 1px;
-      height: 8px;
-      background: var(--border);
-      margin-left: calc(1.5rem + 0.75rem + 1.1rem);
-    }
-
-    /* ── INPUT AREA ── */
-    .input-area {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    #word-input {
-      flex: 1;
-      border: 1.5px solid var(--border);
-      background: transparent;
-      padding: 0.75rem 1rem;
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink);
-      outline: none;
-      transition: border-color 0.2s;
-    }
+    .input-area { width: 100%; display: flex; flex-direction: column; gap: 0.75rem; }
+    .input-row { display: flex; gap: 0.5rem; }
+    #word-input { flex: 1; border: 1.5px solid var(--border); background: transparent; padding: 0.75rem 1rem; font-family: 'DM Serif Display', serif; font-size: 1.1rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); outline: none; }
     #word-input:focus { border-color: var(--ink); }
-    #word-input.error { border-color: var(--rust); animation: shake 0.3s ease; }
-
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-6px); }
-      75% { transform: translateX(6px); }
-    }
-
-    #submit-btn {
-      background: var(--ink);
-      color: var(--cream);
-      border: none;
-      padding: 0.75rem 1.5rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+    #word-input.shake { animation: shake 0.3s ease; border-color: var(--rust); }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    #submit-btn { background: var(--ink); color: var(--cream); border: none; padding: 0.75rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
     #submit-btn:hover { background: var(--rust); }
-    #submit-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+    .error-msg { font-size: 0.78rem; color: var(--rust); min-height: 1.2rem; text-align: center; }
 
-    .error-msg {
-      font-size: 0.78rem;
-      color: var(--rust);
-      letter-spacing: 0.05em;
-      min-height: 1.2rem;
-      text-align: center;
-    }
+    .stats-bar { display: flex; gap: 2rem; justify-content: center; width: 100%; padding: 1rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .stat { text-align: center; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 2rem; line-height: 1; letter-spacing: -0.02em; }
+    .stat-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
 
-    /* ── STATS BAR ── */
-    .stats-bar {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      width: 100%;
-      padding: 1rem 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .stat {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2rem;
-      line-height: 1;
-      letter-spacing: -0.02em;
-    }
-
-    .stat-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 0.2rem;
-    }
-
-    /* ── WIN PANEL ── */
-    .win-panel {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.25rem;
-      width: 100%;
-      padding: 2rem;
-      border: 1.5px solid var(--border);
-      text-align: center;
-    }
-
+    .win-panel { display: none; flex-direction: column; align-items: center; gap: 1.25rem; width: 100%; padding: 2rem; border: 1.5px solid var(--border); text-align: center; }
     .win-panel.visible { display: flex; }
-
-    .win-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2rem;
-      letter-spacing: -0.02em;
-    }
-
+    .win-title { font-family: 'DM Serif Display', serif; font-size: 2rem; letter-spacing: -0.02em; }
     .win-title em { font-style: italic; color: var(--rust); }
-
-    .win-score {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
+    .win-score { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
     .win-score strong { color: var(--ink); font-weight: 500; }
+    .share-text { font-size: 0.8rem; background: var(--ink); color: var(--cream); padding: 1rem 1.5rem; line-height: 1.8; white-space: pre; text-align: left; width: 100%; }
+    .share-btn { background: var(--rust); color: var(--cream); border: none; padding: 0.75rem 2rem; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; width: 100%; }
+    .next-puzzle { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; }
 
-    .share-result {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.8rem;
-      background: var(--ink);
-      color: var(--cream);
-      padding: 1rem 1.5rem;
-      letter-spacing: 0.05em;
-      line-height: 1.8;
-      white-space: pre;
-      text-align: left;
-      width: 100%;
-    }
-
-    .share-btn {
-      background: var(--rust);
-      color: var(--cream);
-      border: none;
-      padding: 0.75rem 2rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: opacity 0.2s;
-      width: 100%;
-    }
-    .share-btn:hover { opacity: 0.85; }
-
-    .next-puzzle {
-      font-size: 0.72rem;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-    }
-
-    /* ── HOW TO PLAY MODAL ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(26,23,20,0.7);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,23,20,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem; }
     .modal-overlay.visible { display: flex; }
-
-    .modal {
-      background: var(--cream);
-      border: 1.5px solid var(--border);
-      padding: 2.5rem;
-      max-width: 420px;
-      width: 100%;
-      position: relative;
-    }
-
-    .modal-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.6rem;
-      letter-spacing: -0.02em;
-      margin-bottom: 1.25rem;
-    }
-
-    .modal p {
-      font-size: 0.88rem;
-      line-height: 1.7;
-      color: var(--muted);
-      margin-bottom: 0.75rem;
-    }
-
+    .modal { background: var(--cream); border: 1.5px solid var(--border); padding: 2.5rem; max-width: 420px; width: 100%; position: relative; }
+    .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 1.25rem; }
+    .modal p { font-size: 0.88rem; line-height: 1.7; color: var(--muted); margin-bottom: 0.75rem; }
     .modal p strong { color: var(--ink); font-weight: 500; }
-
-    .modal-example {
-      display: flex;
-      gap: 4px;
-      margin: 0.5rem 0 1rem;
-    }
-
-    .modal-letter {
-      width: 2rem;
-      height: 2rem;
-      border: 1.5px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Serif Display', serif;
-      font-size: 1rem;
-      text-transform: uppercase;
-    }
-
-    .modal-letter.highlight {
-      background: var(--ink);
-      color: var(--cream);
-      border-color: var(--ink);
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 1rem; right: 1rem;
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      color: var(--muted);
-      cursor: pointer;
-      transition: color 0.2s;
-    }
+    .modal-example { display: flex; gap: 4px; margin: 0.4rem 0; }
+    .modal-letter { width: 2rem; height: 2rem; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 1rem; text-transform: uppercase; }
+    .modal-letter.hl { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+    .close-btn { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; color: var(--muted); cursor: pointer; }
     .close-btn:hover { color: var(--ink); }
 
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
+    footer { border-top: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; font-size: 0.68rem; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
     footer a { color: var(--rust); text-decoration: none; }
   </style>
 </head>
 <body>
 
-<!-- HOW TO PLAY MODAL -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
-    <button class="close-btn" onclick="closeModal()">✕</button>
+    <button class="close-btn" id="close-modal">✕</button>
     <div class="modal-title">How to Play</div>
-    <p>Transform the <strong>start word</strong> into the <strong>end word</strong>, one letter at a time.</p>
+    <p>Transform the <strong>start word</strong> into the <strong>target word</strong>, one letter at a time.</p>
     <p>Each step must be a <strong>real word</strong>. You can only change <strong>one letter</strong> per step.</p>
-    <p>Example: <strong>COLD → WARM</strong></p>
+    <p>Example: COLD → WARM</p>
     <div class="modal-example">
-      <div class="modal-letter">C</div>
-      <div class="modal-letter">O</div>
-      <div class="modal-letter">L</div>
-      <div class="modal-letter">D</div>
+      <div class="modal-letter is-start">C</div><div class="modal-letter is-start">O</div><div class="modal-letter is-start">L</div><div class="modal-letter is-start">D</div>
     </div>
     <div class="modal-example">
-      <div class="modal-letter highlight">W</div>
-      <div class="modal-letter">O</div>
-      <div class="modal-letter">L</div>
-      <div class="modal-letter">D</div>
+      <div class="modal-letter hl">W</div><div class="modal-letter">O</div><div class="modal-letter">L</div><div class="modal-letter">D</div>
     </div>
     <div class="modal-example">
-      <div class="modal-letter highlight">W</div>
-      <div class="modal-letter highlight">A</div>
-      <div class="modal-letter">L</div>
-      <div class="modal-letter highlight">K</div>
+      <div class="modal-letter hl">W</div><div class="modal-letter hl">A</div><div class="modal-letter">L</div><div class="modal-letter hl">K</div>
     </div>
     <div class="modal-example">
-      <div class="modal-letter highlight">W</div>
-      <div class="modal-letter highlight">A</div>
-      <div class="modal-letter highlight">R</div>
-      <div class="modal-letter highlight">M</div>
+      <div class="modal-letter is-end">W</div><div class="modal-letter is-end">A</div><div class="modal-letter is-end">R</div><div class="modal-letter is-end">M</div>
     </div>
-    <p><strong>Par</strong> is the minimum number of steps needed. Try to match or beat it!</p>
-    <p>A new puzzle every day. Share your result without spoilers.</p>
+    <p style="margin-top:0.75rem"><strong>Par</strong> is the target number of steps. Try to match or beat it!</p>
   </div>
 </div>
 
 <header>
   <a href="index.html" class="back-link">← Portfolio</a>
   <div class="game-title">Lad<em>der</em></div>
-  <div class="header-right">
-    <button class="how-btn" onclick="openModal()">How to play</button>
-  </div>
+  <button class="how-btn" id="how-btn">How to play</button>
 </header>
 
 <main>
-
   <div class="puzzle-info">
     <span id="puzzle-date"></span>
     <div class="par-badge">Par <strong id="par-display">—</strong></div>
     <span id="puzzle-num"></span>
   </div>
-
   <div class="word-display" id="word-display"></div>
-
   <div class="input-area" id="input-area">
     <div class="input-row">
-      <input type="text" id="word-input" maxlength="7" placeholder="Type a word…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <input type="text" id="word-input" maxlength="7" placeholder="Your next word…" autocomplete="off" autocorrect="off" spellcheck="false"/>
       <button id="submit-btn">→</button>
     </div>
     <div class="error-msg" id="error-msg"></div>
   </div>
-
   <div class="stats-bar">
-    <div class="stat">
-      <div class="stat-value" id="stat-steps">0</div>
-      <div class="stat-label">Steps</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-par">—</div>
-      <div class="stat-label">Par</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="stat-streak">0</div>
-      <div class="stat-label">Streak</div>
-    </div>
+    <div class="stat"><div class="stat-value" id="stat-steps">0</div><div class="stat-label">Steps</div></div>
+    <div class="stat"><div class="stat-value" id="stat-par">—</div><div class="stat-label">Par</div></div>
+    <div class="stat"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
   </div>
-
   <div class="win-panel" id="win-panel">
     <div class="win-title">Well <em>done!</em></div>
     <div class="win-score" id="win-score"></div>
-    <div class="share-result" id="share-result"></div>
-    <button class="share-btn" onclick="shareResult()">Copy Result</button>
+    <div class="share-text" id="share-text"></div>
+    <button class="share-btn" id="share-btn">Copy Result</button>
     <div class="next-puzzle" id="next-puzzle"></div>
   </div>
-
 </main>
 
 <footer>
@@ -564,281 +174,215 @@
 </footer>
 
 <script>
-// ── WORD LIST (common 4-7 letter words for validation) ──
-// A solid subset for validation — enough for robust play
-const VALID_WORDS = new Set([
-  // 4-letter
-  "able","acid","aged","also","area","army","away","baby","back","ball","band","bank","base","bath","bear","beat","been","bell","best","bike","bill","bird","blow","blue","boat","body","bold","bolt","bond","bone","book","boom","boot","bore","born","boss","both","bout","bowl","burn","bush","busy","call","calm","came","card","care","case","cash","cast","cave","cell","chat","chin","chip","city","clap","clay","clip","club","clue","coat","code","coil","cold","come","cook","cool","cope","copy","cord","core","corn","cost","coup","crew","crop","cure","curl","dame","dare","dark","dart","data","dawn","days","dead","deal","dear","debt","deck","deed","deep","deny","desk","diet","dirt","dish","disk","dock","does","dome","done","door","dose","down","draw","drew","drip","drop","drum","dual","dull","dump","dune","dusk","dust","duty","each","earn","ease","east","easy","edge","else","emit","even","ever","exam","face","fact","fail","fair","fall","fame","farm","fast","fate","fear","feat","feed","feel","feet","fell","felt","file","fill","film","find","fine","fire","firm","fish","fist","flag","flat","flew","flip","flaw","flew","flew","flow","foam","fold","folk","fond","font","food","foot","fore","fork","form","fort","foul","four","free","from","fuel","full","fund","fuse","fuss","gaze","gear","gift","girl","give","glad","glow","glue","goal","goes","gold","golf","gone","good","grab","gray","grew","grey","grid","grin","grip","grow","gulf","gust","guys","hack","hair","half","hall","halt","hand","hang","hard","harm","harp","hate","have","head","heal","heap","hear","heat","heel","held","help","here","hero","hide","high","hill","hint","hold","hole","home","hood","hook","hope","horn","hose","host","hour","huge","hull","hunt","hurt","idea","into","iron","isle","item","jail","join","joke","jump","just","keen","keep","kill","kind","king","kiss","knew","knit","knob","know","lace","lack","lake","lamp","land","lane","last","late","lava","lawn","lead","leaf","lean","leap","left","lend","lens","lest","lift","like","limp","line","link","lion","list","live","load","loan","lock","loft","lone","long","look","loop","lord","lore","lose","loss","lost","loud","love","luck","lung","lure","lurk","made","mail","main","make","male","mall","malt","mane","many","mark","mask","mass","mast","math","maze","meal","mean","meat","meet","melt","menu","mesh","mild","mill","mind","mine","mist","mode","mold","moon","more","most","move","much","mule","muse","must","myth","nail","name","navy","near","neck","need","nest","news","next","nice","nine","node","none","noon","norm","nose","note","null","oath","obey","open","oven","over","pace","pack","page","paid","pain","pale","palm","park","part","pass","past","path","peak","peel","peer","pick","pile","pine","pink","pipe","plan","play","plea","plot","plow","plug","plus","poem","poet","pole","poll","pond","pool","poor","pore","pose","post","pour","prey","prod","prop","pull","pump","pure","push","quit","race","rack","rage","raid","rail","rain","rake","ramp","rang","rank","rare","rate","read","real","reap","reed","reel","rely","rend","rent","rest","rice","rich","ride","ring","rink","riot","rise","risk","road","roam","roar","robe","rock","rode","role","roll","roof","room","root","rope","rose","ruin","rule","rush","rust","safe","sage","said","sail","sake","sale","salt","same","sand","sane","sang","sank","save","seal","seam","seat","seed","seek","seem","seen","self","sell","send","sent","shed","ship","shop","shot","show","shut","sick","side","sigh","sign","silk","sing","sink","site","size","skin","skip","slam","slap","slip","slot","slow","slug","snap","snow","soak","soap","soar","sock","soft","soil","sole","some","song","soon","sore","sort","soul","soup","sour","span","spin","spit","spot","spur","stab","star","stay","stem","step","stir","stop","strap","stub","stun","such","suit","sung","sunk","sure","surf","swan","swap","swam","swim","tale","tall","tame","tank","tape","task","tame","tear","tell","tent","term","test","text","than","that","them","then","they","thin","this","thus","tide","till","time","tire","toad","told","toll","tomb","tome","tone","took","tool","tops","tore","torn","toss","tour","town","trap","tree","trek","trim","trio","trip","true","tube","tuck","tune","turf","turn","twin","type","ugly","undo","unit","upon","used","vain","vale","vane","vase","vast","very","vest","view","vile","vine","void","volt","wade","wage","wake","walk","wall","wand","want","ward","warm","warp","wart","wary","wast","wave","weak","wean","weed","week","well","went","were","west","when","whip","whom","wide","wife","wild","wilt","wind","wine","wing","wink","wire","wise","wish","with","woke","womb","wool","word","wore","work","worm","worn","wrap","wren","writ","yard","year","your","zeal","zero","zone","zoom",
-  // 5-letter
-  "about","above","abuse","actor","acute","admit","adopt","adult","after","again","agent","agree","ahead","alarm","album","alert","alien","align","alike","alive","alley","allow","alone","along","aloud","alter","among","angel","anger","angle","angry","anime","ankle","annex","apart","apple","apply","arena","argue","arise","armor","aroma","arose","array","arson","aside","asked","asset","atlas","attic","audio","audit","avoid","awake","award","aware","awful","badly","baker","basis","batch","beach","began","begin","being","below","bench","bible","bitch","black","blade","blame","bland","blank","blast","blaze","bleed","bless","blind","block","blood","bloom","blown","board","boast","bonus","booze","bored","brain","brand","brave","bread","break","breed","brick","bride","brief","bring","broad","broke","brook","broth","brown","brush","buddy","build","built","bunch","burnt","buyer","cabin","candy","carry","catch","cause","chain","chair","chaos","charm","chart","chase","cheap","cheat","check","cheek","cheer","chess","chest","chief","child","chili","chill","chomp","chord","chore","chose","chunk","civil","claim","class","clean","clear","clerk","click","cliff","climb","cling","clock","clone","close","cloth","cloud","coach","coast","color","comes","comic","comma","comma","count","cover","crack","craft","crash","crazy","cream","creek","crime","crisp","cross","crowd","crown","crush","curve","cycle","daily","dance","dated","dealt","death","debut","decoy","delta","dense","depot","depth","derby","devil","digit","diner","dirty","disco","dizzy","dodge","doing","donor","doubt","dough","dowry","dozen","draft","drain","drama","drape","drawn","dread","dream","dress","dried","drift","drill","drink","drive","drove","drown","drunk","dryer","dying","eager","early","earth","eight","elect","empty","enemy","enjoy","enter","equal","error","essay","event","every","exact","exist","extra","fable","faded","faint","faith","fancy","farce","fatal","fault","feast","fence","fetch","fever","fewer","field","fifth","fifty","fight","final","first","fixed","flame","flash","flask","fleet","flesh","flock","flood","floor","flora","flour","flown","flute","focal","focus","folio","force","forge","forth","forum","found","frame","frank","fraud","fresh","fried","front","frost","froze","fruit","fully","funny","furry","games","gauge","gauze","genre","ghost","given","gland","glare","glass","glide","globe","gloom","gloss","gnome","gorge","gourd","grace","grade","grain","grand","grant","grape","grasp","grass","grate","grave","graze","great","greed","green","greet","grief","grill","groan","grope","gross","group","grout","grove","gruel","gruff","guard","guess","guest","guile","guise","gusto","gypsy","habit","happy","harsh","haste","haunt","haven","heart","heavy","hedge","hence","herbs","hinge","hippo","hoist","holly","homer","honey","honor","horse","hotel","hound","house","human","humid","hurry","hyena","hyper","ideal","image","imply","inbox","index","infer","inlet","inner","input","inter","intro","inure","irony","issue","ivory","japan","jelly","jiffy","joint","joust","juice","juicy","karma","kinky","kitty","kneel","knife","knock","known","label","large","laser","latch","later","latte","laugh","layer","learn","lease","least","leave","legal","lemon","level","light","limit","liner","liner","lingo","liver","llama","lodge","logic","loose","lorry","lover","lower","lucky","lunar","lyric","magic","major","maker","manor","maple","march","masse","match","maybe","mayor","media","mercy","merge","merit","metal","micro","might","minor","minus","mirth","miser","model","money","monks","month","moose","moral","mount","mouth","movie","muddy","mulch","multi","mural","music","naive","nerve","never","night","ninja","ninth","noise","north","notch","novel","nurse","nymph","ocean","offer","often","olive","onset","opera","orbit","order","organ","other","ought","outer","outdo","oxide","ozone","paint","panel","panic","paper","party","pasta","paste","patch","pause","peace","peach","pearl","pedal","penny","perch","peril","phase","phone","photo","piano","piece","pilot","pinch","pitch","pixel","pizza","place","plain","plane","plant","plate","plaza","plead","pluck","plumb","plume","plump","plunk","plush","point","poker","polar","poppy","porch","posed","posit","pound","power","press","price","pride","prime","print","prior","privy","prize","probe","prone","proof","prose","proud","prune","psalm","pulse","purse","queen","query","quest","queue","quick","quiet","quota","quote","rabbi","radar","radio","raise","rally","ranch","range","rapid","ratio","reach","ready","realm","rebel","refer","reign","relax","repay","repel","reset","rider","ridge","rifle","risky","rivet","robin","robot","rocky","rouge","rough","rouge","rough","round","route","rover","royal","rugby","ruler","rural","saint","salad","sandy","sauce","scale","scare","scene","scope","score","scout","screw","sedan","seize","sense","serve","setup","seven","shade","shaft","shake","shall","shame","shape","share","shark","sharp","shear","sheen","sheer","sheet","shelf","shell","shift","shine","shirt","shock","shore","short","shout","shove","shrub","shrug","sight","since","sixth","sixty","skill","slate","slave","sleep","slice","slide","slope","smart","smash","smell","smile","smoke","snake","solar","solid","solve","sorry","south","space","spare","spark","speak","spear","speck","speed","spend","spent","spice","spike","spill","spine","spoke","spoon","sport","spray","squad","squat","squid","stack","staff","stage","stain","stale","stalk","stall","stamp","stand","stark","start","state","stave","stead","steal","steam","steel","steep","steer","stern","stiff","still","sting","stock","stomp","stone","stood","store","storm","story","stout","stove","strap","straw","stray","strip","strut","stuck","study","stuff","style","sugar","suite","sunny","super","surge","swamp","swear","sweep","sweet","swept","swift","swing","swirl","sword","swore","sworn","synth","table","talon","tapir","tasty","taunt","teach","teeth","tempo","tense","tenth","tepid","theft","theme","there","these","thick","thing","think","third","thorn","those","three","threw","throw","thumb","tiger","tight","timer","tired","title","today","token","topic","total","touch","tough","towel","tower","toxic","track","trade","trail","train","trait","tramp","trawl","tread","treat","trial","tribe","tried","trout","trove","truck","truly","trump","trunk","trust","truth","tutor","tweak","twirl","twist","tying","udder","ultra","uncle","under","unify","union","unite","unity","until","upper","upset","urban","usage","usual","utter","vague","valid","valor","value","valve","vapor","vault","vicar","video","vigil","villa","virus","visit","visor","vista","vital","vivid","vocal","vodka","voice","voter","waist","waste","watch","water","weary","weave","weigh","weird","whale","wheat","wheel","where","while","white","whole","whose","widen","width","witch","woman","women","world","worry","worse","worst","worth","would","wrath","write","wrote","yacht","yield","young","youth","zebra","zesty",
-  // 6-letter
-  "absent","accept","access","accord","accuse","across","action","actual","afford","afraid","agenda","almost","always","amount","anchor","animal","answer","appeal","appear","around","aspire","assert","assess","assume","attach","attend","August","aurora","author","autumn","avenue","baking","battle","beauty","before","behalf","behind","belief","better","beyond","bisect","bitter","border","bottle","bottom","breach","breath","bridge","bright","broken","bronze","bucket","burden","butter","button","candle","cannon","canopy","castle","caught","center","chance","change","charge","choice","chosen","circle","clench","client","clinic","closet","clover","coarse","coffee","column","combat","commit","corner","course","create","credit","crisis","custom","damage","danger","debris","decide","defend","define","defeat","delete","depend","deploy","desert","design","detail","differ","dinner","direct","domain","double","driven","during","effect","effort","enable","engage","engine","enough","ensure","entire","estate","ethics","except","expand","expect","export","fabric","factor","famine","famous","father","figure","filter","finger","finish","flight","follow","forest","forget","formal","fossil","fought","frozen","future","garden","gather","gender","gentle","glance","global","govern","growth","handle","happen","hardly","header","health","hidden","honest","hunter","impact","import","indeed","indoor","inform","insect","inside","insist","intact","intend","invest","island","itself","jagged","jigsaw","joyful","jungle","junior","kernel","kidney","knight","launch","lawyer","leader","legend","length","lesson","letter","linear","lively","living","losing","manage","marble","market","marvel","matter","member","mentor","method","middle","minute","mirror","modern","module","moment","monkey","mortal","motion","mother","muscle","mutual","narrow","nature","needle","nearly","normal","notice","number","object","obtain","office","offend","oppose","option","origin","orphan","output","oxygen","palace","parent","pencil","people","period","permit","person","phrase","pirate","planet","pledge","pocket","policy","prefer","pretty","prison","profit","proper","public","purple","puzzle","random","reason","record","reduce","refine","refuse","region","reject","relate","remain","remind","rental","repair","repeat","rescue","result","reveal","review","ribbon","ritual","robust","rocket","rotate","rubber","ruling","sample","saying","school","screen","search","secret","sector","select","seller","shadow","signal","simple","single","sister","sketch","smooth","socket","source","square","stable","static","status","steady","stolen","street","strict","strike","string","strong","struck","submit","suffer","supply","system","tablet","talent","target","tender","theory","thread","ticket","timber","tissue","toward","travel","treaty","triple","troops","tunnel","unable","unique","update","useful","valley","vanish","vendor","verbal","verify","victim","vision","volume","wander","weapon","weight","window","winter","wisdom","within","wonder","worker","yellow",
-  // 7-letter
-  "abandon","ability","absence","acclaim","account","achieve","acquire","address","advance","advisor","against","alchemy","already","analyse","ancient","appears","arrange","article","assault","attempt","attract","balance","because","between","billion","cabinet","captain","capture","catalog","century","certain","chapter","charity","circuit","citizen","classic","climate","collect","college","combine","comfort","command","compare","compete","concept","concern","connect","contain","context","control","correct","courage","covered","created","creator","culture","curious","dealing","decided","decline","defense","deliver","despite","destiny","develop","digital","discuss","display","distant","divided","driving","dynamic","economy","element","embrace","emotion","emperor","enhance","example","exclude","exhaust","explain","explore","express","extreme","faction","failure","fantasy","fashion","feature","feeding","fiction","forever","formula","fortune","forward","freedom","general","genuine","gesture","glimpse","glorify","goddess","gravity","habitat","harmony","harvest","history","holiday","horizon","however","hundred","imagine","include","initial","inspire","instead","intense","justice","kingdom","knowing","landing","lasting","leading","learned","lement","liberal","library","limited","logical","machine","magical","managed","mapping","maximum","meaning","medical","minimum","mission","mixture","morning","mystery","natural","network","nothing","nuclear","observe","opening","opinion","outcome","outside","overall","patient","pattern","perfect","perform","perhaps","plastic","popular","primary","problem","proceed","process","produce","program","project","protect","protest","provide","publish","quantum","radical","rapidly","reality","receive","recover","reflect","require","resolve","respect","respond","restore","results","retreat","society","soldier","solution","success","support","surface","teacher","tension","through","totally","towards","trading","traffic","trigger","trouble","typical","ulimate","uncover","undergo","uniform","unknown","unusual","village","virtual","visible","volcano","welcome","western","whether","without","ancient","captain","concept","courage","destiny","element","embrace","kingdom","mystery","network","nothing","problem","protect","reality","success","teacher","through","village","welcome","whether","without"
-]);
+(function() {
+  // Word validation using dictionary API — no hardcoded list needed
+  var wordCache = {};
 
-// ── DAILY PUZZLES ──
-// Seeded by day so everyone gets the same puzzle
-const PUZZLES = [
-  { start: "cold",  end: "warm",  par: 4, solution: ["cold","cord","word","ward","warm"] },
-  { start: "black", end: "white", par: 6, solution: ["black","blank","bland","blond","blood","brood","broad","tread","bread","dread","dream","cream","creak","break","bleak","bleat","bloat","float","flat","flaw","fray","pray","play","clay","clan","can","ban","tan","tin","win","wine","vine","vane","lane","line","lime","time","tide","wide","hide","hire","fire","fore","more","mare","care","core","cure","sure","pure","rule","role","mole","hole","sole","sale","tale","tile","while","whale","shale","shake","share","shore","store","stare","stale","stall","shall","shale","shape","shame","shave","slave","slate","plate","place","plane","flame","flare","flake","flare","glare","grace","trace","brace","place","plane","plant","slant","slang","clang","clank","blank","bland","brand","braid","train","trail","grail","snail","snail","snare","share","shore","swore","score","scare","stare","stale","stall","small","smell","spell","spelt","smelt","smelt","swelt","dwelt","dealt","death","heath","heart","heard","hears","bears","beers","beets","meets","meats","seats","seals","deals","heals","heads","beads","reads","leads","leaqs","leaks","peaks","pears","bears","sears","tears","years","gears","fears","nears","wears","swear","sweat","wheat","cheat","cheap","heap","reap","read","bead","dead","deal","seal","meal","meat","heat","head","heal","real","reel","heel","feel","fell","felt","melt","belt","bolt","boot","hoot","hoop","loop","loon","moon","boon","boor","poor","pool","cool","coal","coat","goat","moat","boat","boar","soar","soak","soap","reap","leap","lead","dead","head","heat","heap","reap","lean","bean","mean","moan","loan","loin","coin","corn","born","bore","core","fore","fire","hire","here","hare","bare","care","dare","daze","gaze","gave","cave","cove","dove","love","live","lime","time","dime","dame","game","gate","late","laze","maze","daze","days","pays","jays","ways","wars","wards","cards","yards","bards","barns","burns","turns","tyres","tyres","tires","tiles","files","miles","piles","pills","fills","bills","bids","bind","find","fine","line","wine","vine","dine","dire","fire","fore","bore","core","more","mare","care","dare","date","late","gate","gaze","daze","days"],
-  { start: "head",  end: "tail",  par: 5, solution: ["head","heal","teal","tell","tall","tail"] },
-  { start: "cat",   end: "dog",   par: 3, solution: ["cat","cot","dot","dog"] },
-  { start: "stone", end: "bread", par: 6, solution: ["stone","store","stare","share","shame","shale","shall","small","smell","spell","speal","steal","stead","bread"] },
-  { start: "black", end: "white", par: 7, solution: ["black","slack","slick","click","chick","thick","think","thing","thong","thorn","sworn","swore","shore","share","shame","shale","whale","while","white"] },
-  { start: "light", end: "dark",  par: 5, solution: ["light","night","might","mist","fist","fish","dish","dash","gash","gas","gap","map","man","ban","bar","far","tar","tan","ran","pan","ban","bar","car","care","dare","dark"] },
-  { start: "love",  end: "hate",  par: 4, solution: ["love","live","line","lane","late","hate"] },
-  { start: "dream", end: "awake", par: 6, solution: ["dream","cream","creak","break","bleak","bleat","pleat","plead","pleas","fleas","fleak","fleck","flesh","fresh","awake"] },
-  { start: "north", end: "south", par: 6, solution: ["north","forth","force","farce","farce","sauce","since","mince","mints","hints","hunts","bunts","bunts","burnt","burst","worst","worst","wurst","worst","south"] },
-  { start: "begin", end: "ended", par: 5, solution: ["begin","rein","reign","vein","vend","bend","mend","mended","ended"] },
-  { start: "sharp", end: "blunt", par: 6, solution: ["sharp","harp","hard","card","cord","word","worn","burn","bun","blunt"] },
-  { start: "river", end: "ocean", par: 6, solution: ["river","liver","laver","layer","laser","loser","oaken","ocean"] },
-  { start: "paper", end: "stone", par: 6, solution: ["paper","taper","caper","cares","cores","bores","bones","tones","stone"] },
-  { start: "sword", end: "peace", par: 7, solution: ["sword","swore","store","stare","share","phase","place","peace"] },
-];
+  function isValidWord(word, callback) {
+    if (wordCache[word] !== undefined) { callback(wordCache[word]); return; }
+    fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
+      .then(function(r) { wordCache[word] = r.ok; callback(r.ok); })
+      .catch(function() { wordCache[word] = false; callback(false); });
+  }
 
-// ── SEED PUZZLE FROM DATE ──
-const _today = new Date();
-const _start = new Date(2026, 0, 1);
-const dayNum = Math.floor((_today - _start) / 86400000);
-const puzzle = PUZZLES[dayNum % PUZZLES.length];
+  var PUZZLES = [
+    { start: "black", end: "white", par: 7 },
+    { start: "bread", end: "toast", par: 5 },
+    { start: "light", end: "dark",  par: 6 },
+    { start: "stone", end: "bread", par: 6 },
+    { start: "sleep", end: "awake", par: 6 },
+    { start: "black", end: "night", par: 5 },
+    { start: "grass", end: "green", par: 5 },
+    { start: "nurse", end: "house", par: 5 },
+    { start: "chair", end: "floor", par: 5 },
+    { start: "river", end: "ocean", par: 6 },
+    { start: "north", end: "south", par: 7 },
+    { start: "tiger", end: "zebra", par: 6 },
+    { start: "plant", end: "fruit", par: 6 },
+    { start: "saint", end: "devil", par: 6 },
+    { start: "smile", end: "frown", par: 6 }
+  ];
 
-// ── STATE ──
-let chain = [puzzle.start];
-let steps = 0;
-let won = false;
-let streak = parseInt(localStorage.getItem('ladder-streak') || '0');
-let lastWon = localStorage.getItem('ladder-last-won');
+  var today = new Date();
+  var epoch = new Date(2026, 0, 1);
+  var dayIndex = Math.floor((today - epoch) / 86400000);
+  var puz = PUZZLES[((dayIndex % PUZZLES.length) + PUZZLES.length) % PUZZLES.length];
 
-// Update streak display
-document.getElementById('stat-streak').textContent = streak;
-document.getElementById('stat-par').textContent = puzzle.par;
-document.getElementById('par-display').textContent = puzzle.par;
+  var chain = [puz.start];
+  var stepCount = 0;
+  var gameWon = false;
+  var savedStreak = parseInt(localStorage.getItem('ladder-streak') || '0');
+  var savedLastWon = localStorage.getItem('ladder-last-won') || '';
 
-// Date display
-document.getElementById('puzzle-date').textContent =
-  _today.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-document.getElementById('puzzle-num').textContent = `#${dayNum + 1}`;
+  document.getElementById('stat-streak').textContent = savedStreak;
+  document.getElementById('stat-par').textContent = puz.par;
+  document.getElementById('par-display').textContent = puz.par;
+  document.getElementById('stat-steps').textContent = '0';
+  document.getElementById('puzzle-date').textContent = today.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+  document.getElementById('puzzle-num').textContent = '#' + (dayIndex + 1);
 
-// ── RENDER CHAIN ──
-function renderChain() {
-  const display = document.getElementById('word-display');
-  display.innerHTML = '';
+  function renderChain() {
+    var display = document.getElementById('word-display');
+    display.innerHTML = '';
 
-  chain.forEach((word, i) => {
-    if (i > 0) {
-      const conn = document.createElement('div');
-      conn.className = 'connector';
-      display.appendChild(conn);
+    for (var i = 0; i < chain.length; i++) {
+      if (i > 0) {
+        var conn = document.createElement('div');
+        conn.className = 'connector';
+        display.appendChild(conn);
+      }
+      var row = document.createElement('div');
+      row.className = 'word-row';
+
+      var numEl = document.createElement('div');
+      numEl.className = 'step-num';
+      numEl.textContent = i === 0 ? '—' : String(i);
+      row.appendChild(numEl);
+
+      var lettersEl = document.createElement('div');
+      lettersEl.className = 'word-letters';
+      var word = chain[i];
+      for (var j = 0; j < word.length; j++) {
+        var box = document.createElement('div');
+        box.className = 'letter-box';
+        box.textContent = word[j].toUpperCase();
+        if (i === 0) { box.classList.add('is-start'); }
+        else if (word === puz.end) { box.classList.add('is-end'); }
+        else if (chain[i-1] && word[j] !== chain[i-1][j]) { box.classList.add('is-changed'); }
+        lettersEl.appendChild(box);
+      }
+      row.appendChild(lettersEl);
+
+      var labelEl = document.createElement('div');
+      labelEl.className = 'word-label';
+      if (i === 0) { labelEl.textContent = 'Start'; }
+      else if (word === puz.end) { labelEl.textContent = 'Done!'; labelEl.classList.add('is-target-label'); }
+      row.appendChild(labelEl);
+      display.appendChild(row);
     }
 
-    const row = document.createElement('div');
-    row.className = 'word-row';
+    var tConn = document.createElement('div');
+    tConn.className = 'connector';
+    display.appendChild(tConn);
 
-    const num = document.createElement('div');
-    num.className = 'step-num';
-    num.textContent = i === 0 ? '—' : i;
-    row.appendChild(num);
+    var tRow = document.createElement('div');
+    tRow.className = 'word-row';
+    var tNum = document.createElement('div');
+    tNum.className = 'step-num';
+    tNum.textContent = '?';
+    tRow.appendChild(tNum);
+    var tLetters = document.createElement('div');
+    tLetters.className = 'word-letters';
+    for (var k = 0; k < puz.end.length; k++) {
+      var tBox = document.createElement('div');
+      tBox.className = 'letter-box is-end';
+      tBox.textContent = puz.end[k].toUpperCase();
+      tLetters.appendChild(tBox);
+    }
+    tRow.appendChild(tLetters);
+    var tLabel = document.createElement('div');
+    tLabel.className = 'word-label is-target-label';
+    tLabel.textContent = 'Target';
+    tRow.appendChild(tLabel);
+    display.appendChild(tRow);
 
-    const letters = document.createElement('div');
-    letters.className = 'word-letters';
+    document.getElementById('stat-steps').textContent = String(stepCount);
+  }
 
-    word.split('').forEach((ch, j) => {
-      const box = document.createElement('div');
-      box.className = 'letter-box';
-      box.textContent = ch.toUpperCase();
+  function countDiffs(a, b) {
+    if (a.length !== b.length) return 99;
+    var d = 0;
+    for (var i = 0; i < a.length; i++) { if (a[i] !== b[i]) d++; }
+    return d;
+  }
 
-      if (i === 0) {
-        box.classList.add('start');
-      } else if (word === puzzle.end) {
-        box.classList.add('end-word');
-      } else if (chain[i-1] && ch !== chain[i-1][j]) {
-        box.classList.add('changed');
-      }
-      letters.appendChild(box);
+  function showError(msg) {
+    document.getElementById('error-msg').textContent = msg;
+    var inp = document.getElementById('word-input');
+    inp.classList.add('shake');
+    setTimeout(function() { inp.classList.remove('shake'); }, 400);
+  }
+
+  function submitWord() {
+    if (gameWon) return;
+    var inp = document.getElementById("word-input");
+    var word = inp.value.trim().toLowerCase();
+    document.getElementById("error-msg").textContent = "";
+    if (!word) return;
+    var current = chain[chain.length - 1];
+    if (word.length !== puz.start.length) { showError("Must be " + puz.start.length + " letters"); return; }
+    var diffs = countDiffs(word, current);
+    if (diffs === 0) { showError("Same as current word"); return; }
+    if (diffs > 1) { showError("Change only one letter"); return; }
+    if (chain.indexOf(word) !== -1) { showError("Already used that word"); return; }
+    document.getElementById("error-msg").textContent = "Checking...";
+    inp.disabled = true;
+    document.getElementById("submit-btn").disabled = true;
+    isValidWord(word, function(valid) {
+      inp.disabled = false;
+      document.getElementById("submit-btn").disabled = false;
+      document.getElementById("error-msg").textContent = "";
+      if (!valid) { showError("Not a valid word"); return; }
+      chain.push(word);
+      stepCount++;
+      inp.value = "";
+      renderChain();
+      if (word === puz.end) { handleWin(); }
+      inp.focus();
     });
+  }
 
-    row.appendChild(letters);
+  function handleWin() {
+    gameWon = true;
+    document.getElementById('input-area').style.display = 'none';
+    var todayStr = today.toDateString();
+    if (savedLastWon !== todayStr) {
+      var yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      savedStreak = (savedLastWon === yesterday.toDateString()) ? savedStreak + 1 : 1;
+      localStorage.setItem('ladder-streak', String(savedStreak));
+      localStorage.setItem('ladder-last-won', todayStr);
+      document.getElementById('stat-streak').textContent = savedStreak;
+    }
+    var overBy = stepCount - puz.par;
+    var msg = '';
+    if (stepCount < puz.par) { msg = '<strong>' + stepCount + ' steps</strong> — ' + (puz.par - stepCount) + ' under par! 🏆'; }
+    else if (overBy === 0) { msg = '<strong>' + stepCount + ' steps</strong> — exactly par. ✓'; }
+    else { msg = '<strong>' + stepCount + ' steps</strong> — ' + overBy + ' over par. Try again tomorrow!'; }
+    document.getElementById('win-score').innerHTML = msg;
+    var emoji = stepCount <= puz.par ? '🟩' : stepCount <= puz.par + 2 ? '🟨' : '🟥';
+    var grid = '';
+    for (var i = 1; i < chain.length; i++) {
+      var rowStr = '';
+      for (var j = 0; j < chain[i].length; j++) { rowStr += (chain[i][j] === chain[i-1][j]) ? '⬜' : '🟩'; }
+      grid += rowStr + '\n';
+    }
+    document.getElementById('share-text').textContent = 'Ladder #' + (dayIndex+1) + '\n' + stepCount + '/' + puz.par + ' steps ' + emoji + '\n\n' + grid.trim();
+    var tmrw = new Date(today);
+    tmrw.setDate(tmrw.getDate() + 1);
+    tmrw.setHours(0,0,0,0);
+    var msLeft = tmrw - new Date();
+    var h = Math.floor(msLeft / 3600000);
+    var m = Math.floor((msLeft % 3600000) / 60000);
+    document.getElementById('next-puzzle').textContent = 'Next puzzle in ' + h + 'h ' + m + 'm';
+    document.getElementById('win-panel').classList.add('visible');
+  }
 
-    const label = document.createElement('div');
-    label.className = 'word-label';
-    if (i === 0) { label.textContent = 'Start'; }
-    else if (word === puzzle.end) { label.textContent = 'Done!'; label.classList.add('target'); }
-    row.appendChild(label);
-
-    display.appendChild(row);
+  document.getElementById('submit-btn').addEventListener('click', submitWord);
+  document.getElementById('word-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitWord(); });
+  document.getElementById('share-btn').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('share-text').textContent).then(function() {
+      document.getElementById('share-btn').textContent = 'Copied!';
+      setTimeout(function() { document.getElementById('share-btn').textContent = 'Copy Result'; }, 2000);
+    });
   });
+  document.getElementById('how-btn').addEventListener('click', function() { document.getElementById('modal').classList.add('visible'); });
+  document.getElementById('close-modal').addEventListener('click', function() { document.getElementById('modal').classList.remove('visible'); });
+  document.getElementById('modal').addEventListener('click', function(e) { if (e.target === document.getElementById('modal')) document.getElementById('modal').classList.remove('visible'); });
 
-  // Show target
-  const conn = document.createElement('div');
-  conn.className = 'connector';
-  display.appendChild(conn);
-
-  const targetRow = document.createElement('div');
-  targetRow.className = 'word-row';
-
-  const tNum = document.createElement('div');
-  tNum.className = 'step-num';
-  tNum.textContent = '?';
-  targetRow.appendChild(tNum);
-
-  const tLetters = document.createElement('div');
-  tLetters.className = 'word-letters';
-  puzzle.end.split('').forEach(ch => {
-    const box = document.createElement('div');
-    box.className = 'letter-box end-word';
-    box.textContent = ch.toUpperCase();
-    tLetters.appendChild(box);
-  });
-  targetRow.appendChild(tLetters);
-
-  const tLabel = document.createElement('div');
-  tLabel.className = 'word-label target';
-  tLabel.textContent = 'Target';
-  targetRow.appendChild(tLabel);
-
-  display.appendChild(targetRow);
-
-  document.getElementById('stat-steps').textContent = steps;
-}
-
-// ── VALIDATE MOVE ──
-function diffCount(a, b) {
-  if (a.length !== b.length) return Infinity;
-  let diffs = 0;
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) diffs++;
-  return diffs;
-}
-
-function submitWord() {
-  if (won) return;
-  const input = document.getElementById('word-input');
-  const word = input.value.trim().toLowerCase();
-  const err = document.getElementById('error-msg');
-
-  err.textContent = '';
-  input.classList.remove('error');
-
-  if (!word) return;
-
-  const current = chain[chain.length - 1];
-
-  if (word.length !== puzzle.start.length) {
-    showError(`Must be ${puzzle.start.length} letters`);
-    return;
-  }
-
-  if (!VALID_WORDS.has(word)) {
-    showError('Not a valid word');
-    return;
-  }
-
-  const diff = diffCount(word, current);
-  if (diff === 0) {
-    showError('Same as current word');
-    return;
-  }
-  if (diff > 1) {
-    showError('Change only one letter');
-    return;
-  }
-
-  if (chain.includes(word)) {
-    showError('Already used that word');
-    return;
-  }
-
-  chain.push(word);
-  steps++;
-  input.value = '';
   renderChain();
 
-  if (word === puzzle.end) {
-    handleWin();
-  }
-}
-
-function showError(msg) {
-  const input = document.getElementById('word-input');
-  const err = document.getElementById('error-msg');
-  err.textContent = msg;
-  input.classList.add('error');
-  setTimeout(() => input.classList.remove('error'), 400);
-}
-
-// ── WIN ──
-function handleWin() {
-  won = true;
-  document.getElementById('input-area').style.display = 'none';
-
-  // Streak
-  const today = new Date().toDateString();
-  if (lastWon !== today) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    streak = (lastWon === yesterday.toDateString()) ? streak + 1 : 1;
-    localStorage.setItem('ladder-streak', streak);
-    localStorage.setItem('ladder-last-won', today);
-    document.getElementById('stat-streak').textContent = streak;
-  }
-
-  const underPar = steps <= puzzle.par;
-  const atPar = steps === puzzle.par;
-  const overBy = steps - puzzle.par;
-
-  let msg = '';
-  if (steps < puzzle.par) msg = `<strong>${steps} steps</strong> — ${puzzle.par - steps} under par! 🏆`;
-  else if (atPar) msg = `<strong>${steps} steps</strong> — exactly par. Clean. ✓`;
-  else msg = `<strong>${steps} steps</strong> — ${overBy} over par. Try again tomorrow!`;
-
-  document.getElementById('win-score').innerHTML = msg;
-
-  // Share grid
-  const emoji = steps <= puzzle.par ? '🟩' : steps <= puzzle.par + 2 ? '🟨' : '🟥';
-  const grid = chain.slice(1).map((word, i) => {
-    return chain[i].split('').map((ch, j) => ch === word[j] ? '⬜' : '🟩').join('');
-  }).join('\n');
-
-  document.getElementById('share-result').textContent =
-    `Ladder #${dayNum + 1}\n${steps}/${puzzle.par} steps ${emoji}\n\n${grid}`;
-
-  // Next puzzle
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0,0,0,0);
-  const msLeft = tomorrow - new Date();
-  const h = Math.floor(msLeft / 3600000);
-  const m = Math.floor((msLeft % 3600000) / 60000);
-  document.getElementById('next-puzzle').textContent = `Next puzzle in ${h}h ${m}m`;
-
-  document.getElementById('win-panel').classList.add('visible');
-}
-
-// ── SHARE ──
-function shareResult() {
-  const text = document.getElementById('share-result').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.share-btn');
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy Result', 2000);
-  });
-}
-
-// ── MODAL ──
-function openModal() { document.getElementById('modal').classList.add('visible'); }
-function closeModal() { document.getElementById('modal').classList.remove('visible'); }
-document.getElementById('modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal')) closeModal();
-});
-
-// ── EVENTS ──
-document.getElementById('submit-btn').addEventListener('click', submitWord);
-document.getElementById('word-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') submitWord();
-});
-
-// ── INIT ──
-renderChain();
+})();
 </script>
 </body>
 </html>
