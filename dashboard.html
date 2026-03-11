@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clinic Operations Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0e0f;
+      --surface: #111518;
+      --surface2: #181d20;
+      --border: #1f2629;
+      --text: #e8eced;
+      --muted: #4a5568;
+      --accent: #00d4a0;
+      --accent2: #ff6b4a;
+      --accent3: #fbbf24;
+      --grid: rgba(255,255,255,0.02);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(0,212,160,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    * { position: relative; z-index: 1; }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 2.5rem 3rem 0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2rem;
+    }
+
+    .header-left a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .header-left a:hover { color: var(--accent); }
+
+    .header-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-top: 0.5rem;
+      color: var(--text);
+    }
+
+    .header-title span { color: var(--accent); }
+
+    .header-right {
+      text-align: right;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(0,212,160,0.3);
+      padding: 0.35rem 0.8rem;
+      border-radius: 100px;
+      margin-bottom: 0.5rem;
+    }
+
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .timestamp {
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: block;
+    }
+
+    /* ── MAIN ── */
+    main { padding: 2.5rem 3rem; }
+
+    /* ── KPI CARDS ── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      padding: 2rem;
+      transition: background 0.2s;
+    }
+    .kpi-card:hover { background: var(--surface2); }
+
+    .kpi-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .kpi-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .kpi-unit {
+      font-family: 'DM Mono', monospace;
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--muted);
+      margin-left: 0.25rem;
+    }
+
+    .kpi-delta {
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+
+    .kpi-delta.good { background: rgba(0,212,160,0.1); color: var(--accent); }
+    .kpi-delta.bad { background: rgba(255,107,74,0.1); color: var(--accent2); }
+    .kpi-delta.neutral { background: rgba(251,191,36,0.1); color: var(--accent3); }
+
+    .kpi-sparkline {
+      margin-top: 1.5rem;
+      height: 40px;
+    }
+
+    /* ── CHARTS ROW ── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .chart-subtitle {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      letter-spacing: 0.05em;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    canvas { width: 100% !important; }
+
+    /* ── BOTTOM ROW ── */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* ── TABLE ── */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      text-align: left;
+      padding: 0 0 0.75rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--surface2); }
+
+    tbody td {
+      padding: 0.75rem 0;
+      color: var(--text);
+    }
+
+    .status-pill {
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+    }
+
+    .status-good { background: rgba(0,212,160,0.1); color: var(--accent); }
+    .status-warn { background: rgba(251,191,36,0.1); color: var(--accent3); }
+    .status-bad  { background: rgba(255,107,74,0.1); color: var(--accent2); }
+
+    /* ── HEATMAP ── */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: auto repeat(7, 1fr);
+      gap: 3px;
+      margin-top: 0.5rem;
+    }
+
+    .heatmap-label {
+      font-size: 0.6rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      padding-right: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .heatmap-day-label {
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.05em;
+      padding-bottom: 4px;
+    }
+
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 2px;
+      transition: transform 0.15s;
+      cursor: default;
+    }
+    .heatmap-cell:hover { transform: scale(1.2); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 1.5rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.5s forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in:nth-child(1) { animation-delay: 0.05s; }
+    .fade-in:nth-child(2) { animation-delay: 0.1s; }
+    .fade-in:nth-child(3) { animation-delay: 0.15s; }
+
+    @media (max-width: 900px) {
+      header { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+      main { padding: 1.5rem; }
+      .kpi-row { grid-template-columns: 1fr; }
+      .charts-row, .bottom-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.5rem; padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <a href="index.html">← Back to portfolio</a>
+    <div class="header-title">Clinic <span>Ops</span> Dashboard</div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div> Live data</div>
+    <span class="timestamp" id="timestamp"></span>
+  </div>
+</header>
+
+<main>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row">
+    <div class="kpi-card fade-in">
+      <div class="kpi-label">Avg. Patient Wait Time</div>
+      <div class="kpi-value" id="wait-val">—<span class="kpi-unit">min</span></div>
+      <div class="kpi-delta" id="wait-delta"></div>
+      <svg class="kpi-sparkline" id="spark-wait" viewBox="0 0 200 40" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="kpi-card fade-in">
+      <div class="kpi-label">Appointment No-Show Rate</div>
+      <div class="kpi-value" id="noshow-val">—<span class="kpi-unit">%</span></div>
+      <div class="kpi-delta" id="noshow-delta"></div>
+      <svg class="kpi-sparkline" id="spark-noshow" viewBox="0 0 200 40" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="kpi-card fade-in">
+      <div class="kpi-label">Revenue Per Day</div>
+      <div class="kpi-value" id="rev-val">—<span class="kpi-unit">k</span></div>
+      <div class="kpi-delta" id="rev-delta"></div>
+      <svg class="kpi-sparkline" id="spark-rev" viewBox="0 0 200 40" preserveAspectRatio="none"></svg>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">30-Day Trend Overview</div>
+          <div class="chart-subtitle">Wait time · No-show rate · Revenue index</div>
+        </div>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:#00d4a0"></span>Wait</span>
+          <span><span class="legend-dot" style="background:#ff6b4a"></span>No-show</span>
+          <span><span class="legend-dot" style="background:#fbbf24"></span>Revenue</span>
+        </div>
+      </div>
+      <canvas id="trendChart" height="180"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">No-Show by Day</div>
+          <div class="chart-subtitle">This week vs last week</div>
+        </div>
+      </div>
+      <canvas id="barChart" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+
+    <div class="table-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Provider Performance</div>
+          <div class="chart-subtitle">Today's snapshot</div>
+        </div>
+      </div>
+      <table id="provider-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Patients</th>
+            <th>Avg Wait</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="provider-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Wait Time Heatmap</div>
+          <div class="chart-subtitle">By hour · Last 4 weeks</div>
+        </div>
+      </div>
+      <div class="heatmap-grid" id="heatmap"></div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <span>Clinic Operations Dashboard · Simulated data for portfolio purposes</span>
+  <span><a href="index.html">← Noah Bonello</a></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  // ── UTILS ──
+  const rand = (min, max) => Math.random() * (max - min) + min;
+  const randInt = (min, max) => Math.floor(rand(min, max));
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const providers = ['Dr. Patel','Dr. Okafor','Dr. Chen','Dr. Rossi','NP Williams'];
+
+  // ── TIMESTAMP ──
+  const now = new Date();
+  document.getElementById('timestamp').textContent =
+    now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' }) +
+    ' · ' + now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+  // ── SPARKLINE ──
+  function sparkline(svgId, data, color) {
+    const svg = document.getElementById(svgId);
+    const w = 200, h = 40;
+    const min = Math.min(...data), max = Math.max(...data);
+    const pts = data.map((v,i) => {
+      const x = (i / (data.length-1)) * w;
+      const y = h - ((v - min) / (max - min + 0.001)) * (h - 4) - 2;
+      return `${x},${y}`;
+    }).join(' ');
+    svg.innerHTML = `
+      <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="${w}" cy="${h - ((data[data.length-1] - min) / (max - min + 0.001)) * (h-4) - 2}"
+        r="2.5" fill="${color}"/>
+    `;
+  }
+
+  // ── KPI CARDS ──
+  function delta(val, prev, lowerIsBetter, unit='') {
+    const diff = val - prev;
+    const pct = ((Math.abs(diff) / prev) * 100).toFixed(1);
+    const up = diff > 0;
+    const good = lowerIsBetter ? !up : up;
+    const cls = good ? 'good' : 'bad';
+    const arrow = up ? '▲' : '▼';
+    return { html: `<span class="kpi-delta ${cls}">${arrow} ${pct}% vs yesterday</span>`, cls };
+  }
+
+  const waitToday = randInt(12, 28);
+  const waitYest  = randInt(12, 28);
+  const noshowToday = parseFloat(rand(8, 22).toFixed(1));
+  const noshowYest  = parseFloat(rand(8, 22).toFixed(1));
+  const revToday = parseFloat(rand(18, 42).toFixed(1));
+  const revYest  = parseFloat(rand(18, 42).toFixed(1));
+
+  document.getElementById('wait-val').innerHTML = `${waitToday}<span class="kpi-unit">min</span>`;
+  document.getElementById('noshow-val').innerHTML = `${noshowToday}<span class="kpi-unit">%</span>`;
+  document.getElementById('rev-val').innerHTML = `${revToday}<span class="kpi-unit">k</span>`;
+
+  document.getElementById('wait-delta').outerHTML = delta(waitToday, waitYest, true).html;
+  document.getElementById('noshow-delta').outerHTML = delta(noshowToday, noshowYest, true).html;
+  document.getElementById('rev-delta').outerHTML = delta(revToday, revYest, false).html;
+
+  const waitHistory   = Array.from({length:14}, () => randInt(10,30));
+  const noshowHistory = Array.from({length:14}, () => parseFloat(rand(7,24).toFixed(1)));
+  const revHistory    = Array.from({length:14}, () => parseFloat(rand(15,45).toFixed(1)));
+
+  sparkline('spark-wait',   waitHistory,   '#00d4a0');
+  sparkline('spark-noshow', noshowHistory, '#ff6b4a');
+  sparkline('spark-rev',    revHistory,    '#fbbf24');
+
+  // ── CHART.JS DEFAULTS ──
+  Chart.defaults.color = '#4a5568';
+  Chart.defaults.borderColor = '#1f2629';
+  Chart.defaults.font.family = "'DM Mono', monospace";
+  Chart.defaults.font.size = 10;
+
+  // ── TREND CHART ──
+  const labels30 = Array.from({length:30}, (_,i) => {
+    const d = new Date(); d.setDate(d.getDate() - (29-i));
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  });
+
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: labels30,
+      datasets: [
+        {
+          label: 'Wait (min)',
+          data: Array.from({length:30}, () => randInt(10,30)),
+          borderColor: '#00d4a0',
+          backgroundColor: 'rgba(0,212,160,0.05)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 1.5,
+        },
+        {
+          label: 'No-show (%)',
+          data: Array.from({length:30}, () => parseFloat(rand(7,24).toFixed(1))),
+          borderColor: '#ff6b4a',
+          backgroundColor: 'rgba(255,107,74,0.05)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 1.5,
+        },
+        {
+          label: 'Revenue (k)',
+          data: Array.from({length:30}, () => parseFloat(rand(15,45).toFixed(1))),
+          borderColor: '#fbbf24',
+          backgroundColor: 'rgba(251,191,36,0.03)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 1.5,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { maxTicksLimit: 6 } },
+        y: { grid: { color: 'rgba(255,255,255,0.03)' } }
+      }
+    }
+  });
+
+  // ── BAR CHART ──
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [
+        {
+          label: 'This week',
+          data: days.map(() => parseFloat(rand(6,22).toFixed(1))),
+          backgroundColor: 'rgba(0,212,160,0.7)',
+          borderRadius: 3,
+          borderSkipped: false,
+        },
+        {
+          label: 'Last week',
+          data: days.map(() => parseFloat(rand(6,22).toFixed(1))),
+          backgroundColor: 'rgba(0,212,160,0.15)',
+          borderRadius: 3,
+          borderSkipped: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { callback: v => v + '%' } }
+      }
+    }
+  });
+
+  // ── PROVIDER TABLE ──
+  const tbody = document.getElementById('provider-tbody');
+  providers.forEach(name => {
+    const patients = randInt(8, 22);
+    const wait = randInt(8, 35);
+    const status = wait < 15 ? ['On track','good'] : wait < 25 ? ['Moderate','warn'] : ['Delayed','bad'];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td>${patients}</td>
+      <td>${wait} min</td>
+      <td><span class="status-pill status-${status[1]}">${status[0]}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // ── HEATMAP ──
+  const heatmap = document.getElementById('heatmap');
+  const hours = ['8a','9a','10a','11a','12p','1p','2p','3p','4p','5p'];
+  const weeks = ['W1','W2','W3','W4'];
+
+  // Day headers
+  heatmap.appendChild(document.createElement('div')); // corner
+  days.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'heatmap-day-label';
+    el.textContent = d.slice(0,1);
+    heatmap.appendChild(el);
+  });
+
+  weeks.forEach(w => {
+    const label = document.createElement('div');
+    label.className = 'heatmap-label';
+    label.textContent = w;
+    heatmap.appendChild(label);
+    days.forEach(() => {
+      const cell = document.createElement('div');
+      cell.className = 'heatmap-cell';
+      const intensity = rand(0, 1);
+      const r = Math.floor(intensity * 255);
+      const g = Math.floor((1-intensity) * 212);
+      const b = Math.floor((1-intensity) * 160);
+      cell.style.background = `rgba(${r},${g},${b},${0.3 + intensity * 0.6})`;
+      cell.title = `${Math.floor(intensity * 30 + 5)} min avg`;
+      heatmap.appendChild(cell);
+    });
+  });
+</script>
+
+</body>
+</html>
