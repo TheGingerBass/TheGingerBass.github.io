@@ -243,7 +243,7 @@
     <button class="modal-close" id="login-modal-close">✕</button>
     <h3>Sign in</h3>
     <div class="chart-sub">Only needed to add or remove entries</div>
-    <div class="add-form" style="flex-direction:column; align-items:stretch; gap:0.9rem;">
+    <div class="login-form" style="display:flex; flex-direction:column; align-items:stretch; gap:0.9rem;">
       <div class="field">
         <label>Email</label>
         <input type="email" id="login-email" style="width:100%;">
@@ -355,7 +355,7 @@
     document.querySelectorAll('.add-btn[data-key]').forEach(btn => {
       btn.style.display = currentUser ? '' : 'none';
     });
-    document.querySelectorAll('.add-form input').forEach(inp => {
+    document.querySelectorAll('.exercise-card .add-form input').forEach(inp => {
       inp.parentElement.style.display = currentUser ? '' : 'none';
     });
   }
