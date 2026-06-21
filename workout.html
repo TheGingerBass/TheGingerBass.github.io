@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Workout Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #f5f0e8;
+      --ink: #1a1714;
+      --rust: #c8441a;
+      --muted: #7a7269;
+      --border: #d8d0c4;
+      --green: #3a7d44;
+    }
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+    * { position: relative; z-index: 1; }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .back-link { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+    .back-link:hover { color: var(--rust); }
+    .page-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; letter-spacing: -0.02em; position: absolute; left: 50%; transform: translateX(-50%); }
+    .page-title em { font-style: italic; color: var(--rust); }
+    .sync-status { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 0.5rem; }
+    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+    .sync-dot.connected { background: var(--green); }
+    .sync-dot.error { background: var(--rust); }
+
+    main { max-width: 880px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+    /* DAY TABS */
+    .day-tabs { display: flex; gap: 0; border: 1px solid var(--border); margin-bottom: 2.5rem; }
+    .day-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-right: 1px solid var(--border);
+      padding: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .day-tab:last-child { border-right: none; }
+    .day-tab:hover { background: rgba(200,68,26,0.05); color: var(--ink); }
+    .day-tab.active { background: var(--ink); color: var(--cream); }
+
+    .day-panel { display: none; }
+    .day-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* EXERCISE CARD */
+    .exercise-card {
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .exercise-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .exercise-header:hover { background: rgba(200,68,26,0.04); }
+    .exercise-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .chart-icon { font-size: 0.85rem; color: var(--rust); opacity: 0.7; }
+    .pr-badge {
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .pr-badge strong { color: var(--ink); font-weight: 500; }
+
+    .exercise-body { padding: 1.25rem 1.5rem 1.5rem; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 1.25rem; }
+    thead th {
+      text-align: left;
+      padding: 0 0 0.6rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 400;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td { padding: 0.6rem 0; border-bottom: 1px solid rgba(216,208,196,0.5); }
+    tbody tr:last-child td { border-bottom: none; }
+    .empty-row td { color: var(--muted); font-style: italic; padding: 1rem 0; text-align: center; }
+    .del-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 0.85rem; padding: 0.2rem 0.5rem; transition: color 0.15s;
+    }
+    .del-btn:hover { color: var(--rust); }
+
+    /* ADD ENTRY FORM */
+    .add-form { display: flex; gap: 0.6rem; align-items: flex-end; flex-wrap: wrap; }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .field input {
+      border: 1.5px solid var(--border);
+      background: transparent;
+      padding: 0.5rem 0.7rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--ink);
+      outline: none;
+      width: 90px;
+    }
+    .field input:focus { border-color: var(--ink); }
+    .field.date-field input { width: 140px; }
+    .add-btn {
+      background: var(--ink);
+      color: var(--cream);
+      border: none;
+      padding: 0.55rem 1.1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .add-btn:hover { background: var(--rust); }
+    .add-btn:disabled { background: var(--border); cursor: not-allowed; }
+
+    /* CHART MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26,23,20,0.75);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .modal-overlay.visible { display: flex; }
+    .chart-modal {
+      background: var(--cream);
+      border: 1.5px solid var(--border);
+      padding: 2rem;
+      max-width: 640px;
+      width: 100%;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; font-size: 1.2rem;
+      color: var(--muted); cursor: pointer;
+    }
+    .modal-close:hover { color: var(--ink); }
+    .chart-modal h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 0.3rem; }
+    .chart-modal .chart-sub { font-size: 0.75rem; color: var(--muted); margin-bottom: 1.5rem; letter-spacing: 0.04em; }
+    .no-data { text-align: center; color: var(--muted); padding: 3rem 0; font-size: 0.9rem; font-style: italic; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    footer a { color: var(--rust); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      header { padding: 1rem 1.25rem; }
+      .page-title { font-size: 1.3rem; }
+      .sync-status span:not(.sync-dot) { display: none; }
+      main { padding: 1.5rem 1rem 4rem; }
+      .day-tab { font-size: 0.7rem; padding: 0.8rem 0.4rem; }
+      table { font-size: 0.78rem; }
+      .add-form { gap: 0.4rem; }
+      .field input { width: 70px; }
+      .field.date-field input { width: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-link">← Portfolio</a>
+  <div class="page-title">Progressive <em>Overload</em></div>
+  <div class="sync-status">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">Connecting…</span>
+  </div>
+</header>
+
+<main>
+  <div class="day-tabs">
+    <button class="day-tab active" data-day="1">Day 1</button>
+    <button class="day-tab" data-day="2">Day 2</button>
+    <button class="day-tab" data-day="3">Day 3</button>
+  </div>
+
+  <div id="day-panels"></div>
+</main>
+
+<!-- CHART MODAL -->
+<div class="modal-overlay" id="chart-modal-overlay">
+  <div class="chart-modal">
+    <button class="modal-close" id="modal-close">✕</button>
+    <h3 id="modal-title">Exercise</h3>
+    <div class="chart-sub">Weight over time (lbs)</div>
+    <canvas id="progress-chart" height="200"></canvas>
+    <div class="no-data" id="no-data-msg" style="display:none;">No entries logged yet — add your first set to start tracking.</div>
+  </div>
+</div>
+
+<footer>
+  <span>Workout Tracker · Synced with Firebase</span>
+  <span><a href="index.html">Noah Bonello</a></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script type="module">
+  // ════════════════════════════════════════════════════════════
+  //  FIREBASE CONFIG
+  //  Replace the values below with your own Firebase project config.
+  //  See the setup guide for how to get these values.
+  // ════════════════════════════════════════════════════════════
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, doc,
+    onSnapshot, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB7peMfBWhRB8wsEcU3ha7LFr463KDZFAg",
+    authDomain: "noah-workout-tracker.firebaseapp.com",
+    projectId: "noah-workout-tracker",
+    storageBucket: "noah-workout-tracker.firebasestorage.app",
+    messagingSenderId: "630645986292",
+    appId: "1:630645986292:web:ee3d07c687569b6ff39fa1"
+  };
+
+  // ════════════════════════════════════════════════════════════
+  //  EXERCISE CONFIG
+  //  Edit these names to match your actual routine.
+  //  Keep the same number of exercises per day, or add/remove
+  //  array entries freely — the page adapts automatically.
+  // ════════════════════════════════════════════════════════════
+  const DAYS = {
+    1: { label: "Day 1", exercises: ["Exercise A1", "Exercise A2", "Exercise A3", "Exercise A4"] },
+    2: { label: "Day 2", exercises: ["Exercise B1", "Exercise B2", "Exercise B3", "Exercise B4"] },
+    3: { label: "Day 3", exercises: ["Exercise C1", "Exercise C2", "Exercise C3", "Exercise C4"] }
+  };
+
+  // ── INIT FIREBASE ──
+  let db = null;
+  let firebaseReady = false;
+  const syncDot = document.getElementById('sync-dot');
+  const syncLabel = document.getElementById('sync-label');
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    firebaseReady = true;
+    syncDot.classList.add('connected');
+    syncLabel.textContent = 'Synced';
+  } catch (err) {
+    syncDot.classList.add('error');
+    syncLabel.textContent = 'Not configured';
+    console.error('Firebase init failed:', err);
+  }
+
+  // ── STATE ──
+  // entries: { [exerciseKey]: [ {id, weight, reps, sets, date, ts} ... ] }
+  let entries = {};
+
+  function exerciseKey(day, name) {
+    return day + '::' + name;
+  }
+
+  // ── BUILD UI ──
+  const panelsContainer = document.getElementById('day-panels');
+
+  function buildDayPanel(dayId) {
+    const day = DAYS[dayId];
+    const panel = document.createElement('div');
+    panel.className = 'day-panel' + (dayId === 1 ? ' active' : '');
+    panel.id = 'panel-' + dayId;
+
+    day.exercises.forEach(name => {
+      const key = exerciseKey(dayId, name);
+      const card = document.createElement('div');
+      card.className = 'exercise-card';
+      card.innerHTML = `
+        <div class="exercise-header" data-key="${key}" data-name="${name}">
+          <div class="exercise-name"><span class="chart-icon">📈</span>${name}</div>
+          <div class="pr-badge" id="pr-${key}">No entries</div>
+        </div>
+        <div class="exercise-body">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Weight</th><th>Reps</th><th>Sets</th><th></th></tr>
+            </thead>
+            <tbody id="rows-${key}">
+              <tr class="empty-row"><td colspan="5">No sets logged yet</td></tr>
+            </tbody>
+          </table>
+          <div class="add-form">
+            <div class="field date-field">
+              <label>Date</label>
+              <input type="date" id="date-${key}">
+            </div>
+            <div class="field">
+              <label>Weight (lbs)</label>
+              <input type="number" id="weight-${key}" min="0" step="0.5" placeholder="0">
+            </div>
+            <div class="field">
+              <label>Reps</label>
+              <input type="number" id="reps-${key}" min="0" step="1" placeholder="0">
+            </div>
+            <div class="field">
+              <label>Sets</label>
+              <input type="number" id="sets-${key}" min="0" step="1" placeholder="0">
+            </div>
+            <button class="add-btn" data-key="${key}" data-day="${dayId}" data-name="${name}">Log set</button>
+          </div>
+        </div>
+      `;
+      panel.appendChild(card);
+    });
+
+    return panel;
+  }
+
+  Object.keys(DAYS).forEach(dayId => {
+    panelsContainer.appendChild(buildDayPanel(dayId));
+  });
+
+  // Default date inputs to today
+  document.querySelectorAll('input[type="date"]').forEach(input => {
+    input.value = new Date().toISOString().split('T')[0];
+  });
+
+  // ── TAB SWITCHING ──
+  document.querySelectorAll('.day-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.day).classList.add('active');
+    });
+  });
+
+  // ── RENDER ENTRIES FOR ONE EXERCISE ──
+  function renderExerciseRows(key) {
+    const tbody = document.getElementById('rows-' + key);
+    const list = (entries[key] || []).slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No sets logged yet</td></tr>';
+      document.getElementById('pr-' + key).textContent = 'No entries';
+      return;
+    }
+
+    tbody.innerHTML = list.map(e => `
+      <tr>
+        <td>${formatDate(e.date)}</td>
+        <td>${e.weight} lbs</td>
+        <td>${e.reps}</td>
+        <td>${e.sets}</td>
+        <td><button class="del-btn" data-id="${e.id}" data-key="${key}">✕</button></td>
+      </tr>
+    `).join('');
+
+    const maxWeight = Math.max(...list.map(e => e.weight));
+    document.getElementById('pr-' + key).innerHTML = 'PR: <strong>' + maxWeight + ' lbs</strong>';
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+  }
+
+  // ── FIRESTORE SYNC ──
+  function listenToExercise(dayId, name) {
+    const key = exerciseKey(dayId, name);
+    entries[key] = [];
+
+    if (!firebaseReady) { renderExerciseRows(key); return; }
+
+    const q = query(collection(db, 'workoutEntries', key, 'logs'), orderBy('date', 'desc'));
+    onSnapshot(q, snapshot => {
+      entries[key] = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderExerciseRows(key);
+    }, err => {
+      console.error('Snapshot error for', key, err);
+      syncDot.classList.remove('connected');
+      syncDot.classList.add('error');
+      syncLabel.textContent = 'Sync error';
+    });
+  }
+
+  Object.keys(DAYS).forEach(dayId => {
+    DAYS[dayId].exercises.forEach(name => listenToExercise(dayId, name));
+  });
+
+  // ── ADD ENTRY ──
+  document.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('add-btn')) {
+      const key = e.target.dataset.key;
+      const date = document.getElementById('date-' + key).value;
+      const weight = parseFloat(document.getElementById('weight-' + key).value);
+      const reps = parseInt(document.getElementById('reps-' + key).value);
+      const sets = parseInt(document.getElementById('sets-' + key).value);
+
+      if (!date || isNaN(weight) || isNaN(reps) || isNaN(sets)) {
+        alert('Please fill in date, weight, reps, and sets.');
+        return;
+      }
+      if (!firebaseReady) {
+        alert('Firebase isn\'t configured yet — see the setup guide to connect your database.');
+        return;
+      }
+
+      e.target.disabled = true;
+      try {
+        await addDoc(collection(db, 'workoutEntries', key, 'logs'), {
+          date, weight, reps, sets, ts: Date.now()
+        });
+        document.getElementById('weight-' + key).value = '';
+        document.getElementById('reps-' + key).value = '';
+        document.getElementById('sets-' + key).value = '';
+      } catch (err) {
+        alert('Failed to save entry. Check console for details.');
+        console.error(err);
+      }
+      e.target.disabled = false;
+    }
+
+    if (e.target.classList.contains('del-btn')) {
+      const key = e.target.dataset.key;
+      const id = e.target.dataset.id;
+      if (!confirm('Delete this entry?')) return;
+      try {
+        await deleteDoc(doc(db, 'workoutEntries', key, 'logs', id));
+      } catch (err) {
+        alert('Failed to delete entry.');
+        console.error(err);
+      }
+    }
+
+    const header = e.target.closest('.exercise-header');
+    if (header) {
+      openChart(header.dataset.key, header.dataset.name);
+    }
+  });
+
+  // ── CHART MODAL ──
+  let chartInstance = null;
+  const modalOverlay = document.getElementById('chart-modal-overlay');
+
+  function openChart(key, name) {
+    document.getElementById('modal-title').textContent = name;
+    const list = (entries[key] || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const canvas = document.getElementById('progress-chart');
+    const noData = document.getElementById('no-data-msg');
+
+    if (list.length === 0) {
+      canvas.style.display = 'none';
+      noData.style.display = 'block';
+    } else {
+      canvas.style.display = 'block';
+      noData.style.display = 'none';
+
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: list.map(e => formatDate(e.date)),
+          datasets: [{
+            label: 'Weight (lbs)',
+            data: list.map(e => e.weight),
+            borderColor: '#c8441a',
+            backgroundColor: 'rgba(200,68,26,0.08)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: '#1a1714',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#d8d0c4' }, ticks: { color: '#7a7269', font: { family: 'DM Sans' } } },
+            y: { grid: { color: '#d8d0c4' }, ticks: { color: '#7a7269', font: { family: 'DM Sans' } } }
+          }
+        }
+      });
+    }
+
+    modalOverlay.classList.add('visible');
+  }
+
+  document.getElementById('modal-close').addEventListener('click', () => {
+    modalOverlay.classList.remove('visible');
+  });
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) modalOverlay.classList.remove('visible');
+  });
+</script>
+
+</body>
+</html>
