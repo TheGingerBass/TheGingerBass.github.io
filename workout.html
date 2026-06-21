@@ -221,7 +221,7 @@
 <header>
   <a href="index.html" class="back-link">← Portfolio</a>
   <div class="page-title">Progressive <em>Overload</em></div>
-  <div class="sync-status">
+  <div class="sync-status" id="auth-area">
     <div class="sync-dot" id="sync-dot"></div>
     <span id="sync-label">Connecting…</span>
   </div>
@@ -236,6 +236,27 @@
 
   <div id="day-panels"></div>
 </main>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal-overlay">
+  <div class="chart-modal" style="max-width:380px;">
+    <button class="modal-close" id="login-modal-close">✕</button>
+    <h3>Sign in</h3>
+    <div class="chart-sub">Only needed to add or remove entries</div>
+    <div class="add-form" style="flex-direction:column; align-items:stretch; gap:0.9rem;">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" style="width:100%;">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-password" style="width:100%;">
+      </div>
+      <div class="error-msg" id="login-error" style="font-size:0.78rem; color:var(--rust); min-height:1rem;"></div>
+      <button class="add-btn" id="login-submit" style="width:100%;">Sign in</button>
+    </div>
+  </div>
+</div>
 
 <!-- CHART MODAL -->
 <div class="modal-overlay" id="chart-modal-overlay">
@@ -265,6 +286,9 @@
     getFirestore, collection, addDoc, deleteDoc, doc,
     onSnapshot, query, orderBy
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import {
+    getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB7peMfBWhRB8wsEcU3ha7LFr463KDZFAg",
@@ -289,13 +313,18 @@
 
   // ── INIT FIREBASE ──
   let db = null;
+  let auth = null;
   let firebaseReady = false;
+  let currentUser = null;
+  const OWNER_UID = "copJYmxI9rfEfdF2WKARITlQvCC3";
   const syncDot = document.getElementById('sync-dot');
   const syncLabel = document.getElementById('sync-label');
+  const authArea = document.getElementById('auth-area');
 
   try {
     const app = initializeApp(firebaseConfig);
     db = getFirestore(app);
+    auth = getAuth(app);
     firebaseReady = true;
     syncDot.classList.add('connected');
     syncLabel.textContent = 'Synced';
@@ -304,6 +333,65 @@
     syncLabel.textContent = 'Not configured';
     console.error('Firebase init failed:', err);
   }
+
+  function renderAuthArea() {
+    if (currentUser) {
+      authArea.innerHTML = `
+        <div class="sync-dot connected"></div>
+        <span>Signed in</span>
+        <button id="signout-btn" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.3rem 0.6rem;cursor:pointer;margin-left:0.5rem;">Sign out</button>
+      `;
+      document.getElementById('signout-btn').addEventListener('click', () => signOut(auth));
+    } else {
+      authArea.innerHTML = `
+        <div class="sync-dot connected"></div>
+        <span>Viewing</span>
+        <button id="signin-btn" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.3rem 0.6rem;cursor:pointer;margin-left:0.5rem;">Sign in</button>
+      `;
+      document.getElementById('signin-btn').addEventListener('click', () => {
+        document.getElementById('login-modal-overlay').classList.add('visible');
+      });
+    }
+    document.querySelectorAll('.add-btn[data-key]').forEach(btn => {
+      btn.style.display = currentUser ? '' : 'none';
+    });
+    document.querySelectorAll('.add-form input').forEach(inp => {
+      inp.parentElement.style.display = currentUser ? '' : 'none';
+    });
+  }
+
+  if (firebaseReady) {
+    onAuthStateChanged(auth, user => {
+      currentUser = (user && user.uid === OWNER_UID) ? user : null;
+      renderAuthArea();
+      // Re-render delete buttons visibility
+      document.querySelectorAll('.del-btn').forEach(btn => {
+        btn.style.display = currentUser ? '' : 'none';
+      });
+    });
+  }
+
+  // Login modal handlers
+  document.getElementById('login-submit').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = '';
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      document.getElementById('login-modal-overlay').classList.remove('visible');
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+    } catch (err) {
+      errEl.textContent = 'Sign in failed — check your email and password.';
+    }
+  });
+  document.getElementById('login-modal-close').addEventListener('click', () => {
+    document.getElementById('login-modal-overlay').classList.remove('visible');
+  });
+  document.getElementById('login-modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'login-modal-overlay') e.target.classList.remove('visible');
+  });
 
   // ── STATE ──
   // entries: { [exerciseKey]: [ {id, weight, reps, sets, date, ts} ... ] }
@@ -376,6 +464,8 @@
     input.value = new Date().toISOString().split('T')[0];
   });
 
+  renderAuthArea();
+
   // ── TAB SWITCHING ──
   document.querySelectorAll('.day-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -403,7 +493,7 @@
         <td>${e.weight} lbs</td>
         <td>${e.reps}</td>
         <td>${e.sets}</td>
-        <td><button class="del-btn" data-id="${e.id}" data-key="${key}">✕</button></td>
+        <td><button class="del-btn" data-id="${e.id}" data-key="${key}" style="display:${currentUser ? '' : 'none'}">✕</button></td>
       </tr>
     `).join('');
 
