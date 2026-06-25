@@ -385,9 +385,14 @@
     onAuthStateChanged(auth, user => {
       currentUser = (user && user.uid === OWNER_UID) ? user : null;
       renderAuthArea();
-      // Re-render delete buttons visibility
       document.querySelectorAll('.del-btn').forEach(btn => {
         btn.style.display = currentUser ? '' : 'none';
+      });
+      Object.keys(DAYS).forEach(dayId => {
+        DAYS[dayId].exercises.forEach(exercise => {
+          const key = exerciseKey(dayId, exercise.name);
+          renderExerciseRows(key);
+        });
       });
     });
   }
@@ -486,8 +491,6 @@
   document.querySelectorAll('input[type="date"]').forEach(input => {
     input.value = new Date().toISOString().split('T')[0];
   });
-
-  renderAuthArea();
 
   // ── TAB SWITCHING ──
   document.querySelectorAll('.day-tab').forEach(tab => {
