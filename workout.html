@@ -373,11 +373,9 @@
         document.getElementById('login-modal-overlay').classList.add('visible');
       });
     }
-    document.querySelectorAll('.add-btn[data-key]').forEach(btn => {
-      btn.style.display = currentUser ? '' : 'none';
-    });
-    document.querySelectorAll('.exercise-card .add-form input').forEach(inp => {
-      inp.parentElement.style.display = currentUser ? '' : 'none';
+    // Only show/hide the add forms — never touch structural elements
+    document.querySelectorAll('.add-form').forEach(form => {
+      form.style.display = currentUser ? 'flex' : 'none';
     });
   }
 
