@@ -306,9 +306,30 @@
   //  array entries freely — the page adapts automatically.
   // ════════════════════════════════════════════════════════════
   const DAYS = {
-    1: { label: "Day 1", exercises: ["Dumbbell Goblet Squat", "Dumbell Bench Press", "Single-Arm DB Row", "Dumbbell Shoulder Press", "Dumbbell Curl", "Plank"] },
-    2: { label: "Day 2", exercises: ["Romanian Deadlift", "Pull-Ups", "Dumbbell Reverse Lunge", "Dumbbell Bent-Over Row", "Tricep Kickbacks", "Dead Hang"] },
-    3: { label: "Day 3", exercises: ["DB Thruster (Squat to Press)", "DB Step-Up (Bench)", "Pull-Ups", "Dumbbell Lateral Raise", "DB Hammer Curl", "Mountain Climbers"] }
+    1: { label: "Day 1", exercises: [
+      { name: "Dumbbell Goblet Squat" },
+      { name: "Dumbell Bench Press" },
+      { name: "Single-Arm DB Row" },
+      { name: "Dumbbell Shoulder Press" },
+      { name: "Dumbbell Curl" },
+      { name: "Plank", type: "time" }
+    ]},
+    2: { label: "Day 2", exercises: [
+      { name: "Romanian Deadlift" },
+      { name: "Pull-Ups" },
+      { name: "Dumbbell Reverse Lunge" },
+      { name: "Dumbbell Bent-Over Row" },
+      { name: "Tricep Kickbacks" },
+      { name: "Dead Hang", type: "time" }
+    ]},
+    3: { label: "Day 3", exercises: [
+      { name: "DB Thruster (Squat to Press)" },
+      { name: "DB Step-Up (Bench)" },
+      { name: "Pull-Ups" },
+      { name: "Dumbbell Lateral Raise" },
+      { name: "DB Hammer Curl" },
+      { name: "Mountain Climbers", type: "time" }
+    ]}
   };
 
   // ── INIT FIREBASE ──
@@ -410,19 +431,21 @@
     panel.className = 'day-panel' + (dayId === 1 ? ' active' : '');
     panel.id = 'panel-' + dayId;
 
-    day.exercises.forEach(name => {
+    day.exercises.forEach(exercise => {
+      const name = exercise.name;
+      const isTimed = exercise.type === 'time';
       const key = exerciseKey(dayId, name);
       const card = document.createElement('div');
       card.className = 'exercise-card';
       card.innerHTML = `
-        <div class="exercise-header" data-key="${key}" data-name="${name}">
+        <div class="exercise-header" data-key="${key}" data-name="${name}" data-timed="${isTimed}">
           <div class="exercise-name"><span class="chart-icon">📈</span>${name}</div>
           <div class="pr-badge" id="pr-${key}">No entries</div>
         </div>
         <div class="exercise-body">
           <table>
             <thead>
-              <tr><th>Date</th><th>Weight</th><th>Reps</th><th>Sets</th><th></th></tr>
+              <tr><th>Date</th><th>Weight</th><th>${isTimed ? 'Seconds' : 'Reps'}</th><th>Sets</th><th></th></tr>
             </thead>
             <tbody id="rows-${key}">
               <tr class="empty-row"><td colspan="5">No sets logged yet</td></tr>
@@ -438,14 +461,14 @@
               <input type="number" id="weight-${key}" min="0" step="0.5" placeholder="0">
             </div>
             <div class="field">
-              <label>Reps</label>
+              <label>${isTimed ? 'Seconds' : 'Reps'}</label>
               <input type="number" id="reps-${key}" min="0" step="1" placeholder="0">
             </div>
             <div class="field">
               <label>Sets</label>
               <input type="number" id="sets-${key}" min="0" step="1" placeholder="0">
             </div>
-            <button class="add-btn" data-key="${key}" data-day="${dayId}" data-name="${name}">Log set</button>
+            <button class="add-btn" data-key="${key}" data-day="${dayId}" data-name="${name}" data-timed="${isTimed}">Log set</button>
           </div>
         </div>
       `;
@@ -480,6 +503,7 @@
   function renderExerciseRows(key) {
     const tbody = document.getElementById('rows-' + key);
     const list = (entries[key] || []).slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+    const isTimed = document.querySelector(`.exercise-header[data-key="${key}"]`)?.dataset.timed === 'true';
 
     if (list.length === 0) {
       tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No sets logged yet</td></tr>';
@@ -491,14 +515,17 @@
       <tr>
         <td>${formatDate(e.date)}</td>
         <td>${e.weight} lbs</td>
-        <td>${e.reps}</td>
+        <td>${e.reps}${isTimed ? 's' : ''}</td>
         <td>${e.sets}</td>
         <td><button class="del-btn" data-id="${e.id}" data-key="${key}" style="display:${currentUser ? '' : 'none'}">✕</button></td>
       </tr>
     `).join('');
 
     const maxWeight = Math.max(...list.map(e => e.weight));
-    document.getElementById('pr-' + key).innerHTML = 'PR: <strong>' + maxWeight + ' lbs</strong>';
+    const prLabel = isTimed
+      ? 'Best: <strong>' + Math.max(...list.map(e => e.reps)) + 's</strong>'
+      : 'PR: <strong>' + maxWeight + ' lbs</strong>';
+    document.getElementById('pr-' + key).innerHTML = prLabel;
   }
 
   function formatDate(dateStr) {
@@ -526,7 +553,7 @@
   }
 
   Object.keys(DAYS).forEach(dayId => {
-    DAYS[dayId].exercises.forEach(name => listenToExercise(dayId, name));
+    DAYS[dayId].exercises.forEach(exercise => listenToExercise(dayId, exercise.name));
   });
 
   // ── ADD ENTRY ──
