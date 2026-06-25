@@ -431,7 +431,7 @@
   function buildDayPanel(dayId) {
     const day = DAYS[dayId];
     const panel = document.createElement('div');
-    panel.className = 'day-panel' + (dayId === 1 ? ' active' : '');
+    panel.className = 'day-panel' + (String(dayId) === '1' ? ' active' : '');
     panel.id = 'panel-' + dayId;
 
     day.exercises.forEach(exercise => {
