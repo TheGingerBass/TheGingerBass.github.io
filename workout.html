@@ -512,7 +512,7 @@
           <div class="exercise-name"><span class="chart-icon">📈</span>${name}</div>
           <div style="display:flex;align-items:center;gap:0.5rem;">
             <div class="pr-badge" id="pr-${key}">No entries</div>
-            <button class="form-btn form-guide-btn" data-name="${name}" onclick="event.stopPropagation()">Form</button>
+            <button class="form-btn form-guide-btn" data-name="${name}">Form</button>
           </div>
         </div>
         <div class="exercise-body">
@@ -673,7 +673,7 @@
     }
 
     const header = e.target.closest('.exercise-header');
-    if (header) {
+    if (header && !e.target.classList.contains('form-guide-btn')) {
       openChart(header.dataset.key, header.dataset.name);
     }
   });
@@ -769,28 +769,28 @@
   }
 
   document.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('form-guide-btn')) {
-      e.stopPropagation();
-      const name = e.target.dataset.name;
+    if (!e.target.classList.contains('form-guide-btn')) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const name = e.target.dataset.name;
 
-      document.getElementById('form-modal-title').textContent = name;
-      document.getElementById('form-anim-stage').style.display = 'none';
-      document.getElementById('form-tips-list').innerHTML = '<li style="color:var(--muted);font-style:italic;">Loading form guide…</li>';
-      document.getElementById('form-golden-rule').style.display = 'none';
-      formModalOverlay.classList.add('visible');
+    document.getElementById('form-modal-title').textContent = name;
+    document.getElementById('form-anim-stage').style.display = 'none';
+    document.getElementById('form-tips-list').innerHTML = '<li style="color:var(--muted);font-style:italic;">Loading form guide…</li>';
+    document.getElementById('form-golden-rule').style.display = 'none';
+    formModalOverlay.classList.add('visible');
 
-      try {
-        const guide = await fetchFormGuide(name);
-        document.getElementById('form-tips-list').innerHTML = guide.tips.map(t => `<li>${t}</li>`).join('');
-        const ruleEl = document.getElementById('form-golden-rule');
-        ruleEl.textContent = '✦ ' + guide.cue;
-        ruleEl.style.display = 'block';
-      } catch (err) {
-        document.getElementById('form-tips-list').innerHTML = '<li style="color:var(--rust);">Could not load form guide — check your connection.</li>';
-        console.error(err);
-      }
+    try {
+      const guide = await fetchFormGuide(name);
+      document.getElementById('form-tips-list').innerHTML = guide.tips.map(t => `<li>${t}</li>`).join('');
+      const ruleEl = document.getElementById('form-golden-rule');
+      ruleEl.textContent = '✦ ' + guide.cue;
+      ruleEl.style.display = 'block';
+    } catch (err) {
+      document.getElementById('form-tips-list').innerHTML = '<li style="color:var(--rust);">Could not load form guide — check your connection.</li>';
+      console.error(err);
     }
-  });
+  }, true); // useCapture:true so this fires BEFORE the chart listener
 
 
 </script>
