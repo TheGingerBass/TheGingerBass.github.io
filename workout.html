@@ -197,51 +197,33 @@
       background: var(--cream);
       border: 1.5px solid var(--border);
       padding: 2rem;
-      max-width: 560px;
+      max-width: 540px;
       width: 100%;
       position: relative;
       max-height: 90vh;
       overflow-y: auto;
     }
     .form-modal h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 0.25rem; }
-    .form-modal .form-sub { font-size: 0.75rem; color: var(--rust); margin-bottom: 1.25rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .form-sub-label { font-size: 0.72rem; color: var(--rust); margin-bottom: 1.25rem; letter-spacing: 0.1em; text-transform: uppercase; display: block; }
     .anim-stage {
-      width: 100%;
-      height: 160px;
+      width: 100%; height: 170px;
       background: var(--ink);
-      border-radius: 2px;
       margin-bottom: 1.25rem;
-      position: relative;
       overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
     }
     .anim-stage svg { width: 100%; height: 100%; }
-    .form-tips { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .form-tips { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
     .form-tips li {
-      font-size: 0.85rem;
-      line-height: 1.6;
-      color: var(--ink);
-      padding-left: 1.2rem;
-      position: relative;
+      font-size: 0.85rem; line-height: 1.65;
+      color: var(--ink); padding-left: 1.25rem; position: relative;
     }
-    .form-tips li::before {
-      content: '→';
-      position: absolute;
-      left: 0;
-      color: var(--rust);
-      font-size: 0.75rem;
-    }
+    .form-tips li::before { content: 'â†''; position: absolute; left: 0; color: var(--rust); }
     .form-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.7rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-left: 0.5rem;
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); font-family: 'DM Sans', sans-serif;
+      font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.3rem 0.7rem; cursor: pointer; transition: all 0.2s; margin-left: 0.5rem;
     }
     .form-btn:hover { border-color: var(--rust); color: var(--rust); }
 
@@ -291,15 +273,13 @@
   <div id="day-panels"></div>
 </main>
 
-
 <!-- FORM GUIDE MODAL -->
 <div class="modal-overlay" id="form-modal-overlay">
   <div class="form-modal">
     <button class="modal-close" id="form-modal-close">✕</button>
     <h3 id="form-modal-title"></h3>
-    <div class="form-sub">Form guide</div>
-    <div class="anim-stage" id="form-anim-stage" style="display:none;"></div>
-    <div id="form-golden-rule" style="display:none; background:var(--ink); color:var(--cream); padding:0.75rem 1rem; font-size:0.85rem; font-weight:500; margin-bottom:1.25rem; letter-spacing:0.02em; line-height:1.5;"></div>
+    <span class="form-sub-label">Form guide</span>
+    <div class="anim-stage" id="form-anim-stage"></div>
     <ul class="form-tips" id="form-tips-list"></ul>
   </div>
 </div>
@@ -373,30 +353,9 @@
   //  array entries freely — the page adapts automatically.
   // ════════════════════════════════════════════════════════════
   const DAYS = {
-    1: { label: "Day 1", exercises: [
-      { name: "Dumbbell Goblet Squat" },
-      { name: "Dumbell Bench Press" },
-      { name: "Single-Arm DB Row" },
-      { name: "Dumbbell Shoulder Press" },
-      { name: "Dumbbell Curl" },
-      { name: "Plank", type: "time" }
-    ]},
-    2: { label: "Day 2", exercises: [
-      { name: "Romanian Deadlift" },
-      { name: "Pull-Ups" },
-      { name: "Dumbbell Reverse Lunge" },
-      { name: "Dumbbell Bent-Over Row" },
-      { name: "Tricep Kickbacks" },
-      { name: "Dead Hang", type: "time" }
-    ]},
-    3: { label: "Day 3", exercises: [
-      { name: "DB Thruster (Squat to Press)" },
-      { name: "DB Step-Up (Bench)" },
-      { name: "Pull-Ups" },
-      { name: "Dumbbell Lateral Raise" },
-      { name: "DB Hammer Curl" },
-      { name: "Mountain Climbers", type: "time" }
-    ]}
+    1: { label: "Day 1", exercises: ["Dumbbell Goblet Squat", "Dumbell Bench Press", "Single-Arm DB Row", "Dumbbell Shoulder Press", "Dumbbell Curl", "Plank"] },
+    2: { label: "Day 2", exercises: ["Romanian Deadlift", "Pull-Ups", "Dumbbell Reverse Lunge", "Dumbbell Bent-Over Row", "Tricep Kickbacks", "Dead Hang"] },
+    3: { label: "Day 3", exercises: ["DB Thruster (Squat to Press)", "DB Step-Up (Bench)", "Pull-Ups", "Dumbbell Lateral Raise", "DB Hammer Curl", "Mountain Climbers"] }
   };
 
   // ── INIT FIREBASE ──
@@ -440,9 +399,11 @@
         document.getElementById('login-modal-overlay').classList.add('visible');
       });
     }
-    // Only show/hide the add forms — never touch structural elements
-    document.querySelectorAll('.add-form').forEach(form => {
-      form.style.display = currentUser ? 'flex' : 'none';
+    document.querySelectorAll('.add-btn[data-key]').forEach(btn => {
+      btn.style.display = currentUser ? '' : 'none';
+    });
+    document.querySelectorAll('.exercise-card .add-form input').forEach(inp => {
+      inp.parentElement.style.display = currentUser ? '' : 'none';
     });
   }
 
@@ -450,14 +411,9 @@
     onAuthStateChanged(auth, user => {
       currentUser = (user && user.uid === OWNER_UID) ? user : null;
       renderAuthArea();
+      // Re-render delete buttons visibility
       document.querySelectorAll('.del-btn').forEach(btn => {
         btn.style.display = currentUser ? '' : 'none';
-      });
-      Object.keys(DAYS).forEach(dayId => {
-        DAYS[dayId].exercises.forEach(exercise => {
-          const key = exerciseKey(dayId, exercise.name);
-          renderExerciseRows(key);
-        });
       });
     });
   }
@@ -498,27 +454,25 @@
   function buildDayPanel(dayId) {
     const day = DAYS[dayId];
     const panel = document.createElement('div');
-    panel.className = 'day-panel' + (String(dayId) === '1' ? ' active' : '');
+    panel.className = 'day-panel' + (dayId === 1 ? ' active' : '');
     panel.id = 'panel-' + dayId;
 
-    day.exercises.forEach(exercise => {
-      const name = exercise.name;
-      const isTimed = exercise.type === 'time';
+    day.exercises.forEach(name => {
       const key = exerciseKey(dayId, name);
       const card = document.createElement('div');
       card.className = 'exercise-card';
       card.innerHTML = `
-        <div class="exercise-header" data-key="${key}" data-name="${name}" data-timed="${isTimed}">
+        <div class="exercise-header" data-key="${key}" data-name="${name}">
           <div class="exercise-name"><span class="chart-icon">📈</span>${name}</div>
-          <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div style="display:flex;align-items:center;gap:0.4rem;">
             <div class="pr-badge" id="pr-${key}">No entries</div>
-            <button class="form-btn form-guide-btn" data-name="${name}">Form</button>
+            <button class="form-btn" data-form="${name}">Form</button>
           </div>
         </div>
         <div class="exercise-body">
           <table>
             <thead>
-              <tr><th>Date</th><th>Weight</th><th>${isTimed ? 'Seconds' : 'Reps'}</th><th>Sets</th><th></th></tr>
+              <tr><th>Date</th><th>Weight</th><th>Reps</th><th>Sets</th><th></th></tr>
             </thead>
             <tbody id="rows-${key}">
               <tr class="empty-row"><td colspan="5">No sets logged yet</td></tr>
@@ -534,14 +488,14 @@
               <input type="number" id="weight-${key}" min="0" step="0.5" placeholder="0">
             </div>
             <div class="field">
-              <label>${isTimed ? 'Seconds' : 'Reps'}</label>
+              <label>Reps</label>
               <input type="number" id="reps-${key}" min="0" step="1" placeholder="0">
             </div>
             <div class="field">
               <label>Sets</label>
               <input type="number" id="sets-${key}" min="0" step="1" placeholder="0">
             </div>
-            <button class="add-btn" data-key="${key}" data-day="${dayId}" data-name="${name}" data-timed="${isTimed}">Log set</button>
+            <button class="add-btn" data-key="${key}" data-day="${dayId}" data-name="${name}">Log set</button>
           </div>
         </div>
       `;
@@ -560,6 +514,8 @@
     input.value = new Date().toISOString().split('T')[0];
   });
 
+  renderAuthArea();
+
   // ── TAB SWITCHING ──
   document.querySelectorAll('.day-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -574,7 +530,6 @@
   function renderExerciseRows(key) {
     const tbody = document.getElementById('rows-' + key);
     const list = (entries[key] || []).slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-    const isTimed = document.querySelector(`.exercise-header[data-key="${key}"]`)?.dataset.timed === 'true';
 
     if (list.length === 0) {
       tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No sets logged yet</td></tr>';
@@ -586,17 +541,14 @@
       <tr>
         <td>${formatDate(e.date)}</td>
         <td>${e.weight} lbs</td>
-        <td>${e.reps}${isTimed ? 's' : ''}</td>
+        <td>${e.reps}</td>
         <td>${e.sets}</td>
         <td><button class="del-btn" data-id="${e.id}" data-key="${key}" style="display:${currentUser ? '' : 'none'}">✕</button></td>
       </tr>
     `).join('');
 
     const maxWeight = Math.max(...list.map(e => e.weight));
-    const prLabel = isTimed
-      ? 'Best: <strong>' + Math.max(...list.map(e => e.reps)) + 's</strong>'
-      : 'PR: <strong>' + maxWeight + ' lbs</strong>';
-    document.getElementById('pr-' + key).innerHTML = prLabel;
+    document.getElementById('pr-' + key).innerHTML = 'PR: <strong>' + maxWeight + ' lbs</strong>';
   }
 
   function formatDate(dateStr) {
@@ -624,7 +576,7 @@
   }
 
   Object.keys(DAYS).forEach(dayId => {
-    DAYS[dayId].exercises.forEach(exercise => listenToExercise(dayId, exercise.name));
+    DAYS[dayId].exercises.forEach(name => listenToExercise(dayId, name));
   });
 
   // ── ADD ENTRY ──
@@ -673,7 +625,7 @@
     }
 
     const header = e.target.closest('.exercise-header');
-    if (header && !e.target.classList.contains('form-guide-btn')) {
+    if (header && !e.target.dataset.form) {
       openChart(header.dataset.key, header.dataset.name);
     }
   });
@@ -733,65 +685,185 @@
   modalOverlay.addEventListener('click', (e) => {
     if (e.target === modalOverlay) modalOverlay.classList.remove('visible');
   });
-  // ── FORM GUIDE (AI-powered) ──
-  const formGuideCache = {};
+  // FORM GUIDE DATA
+  const FORM_GUIDES = {
+    "Dumbbell Goblet Squat": {
+      tips: [
+        "Hold one dumbbell vertically at chest height, elbows tucked under it pointing down.",
+        "Feet shoulder-width apart, toes angled out 30 degrees — knees track over your toes.",
+        "Squat until thighs are parallel to the floor; keep your chest tall throughout.",
+        "Drive through your heels to stand, squeezing your glutes at the top of every rep."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes sqUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}.sqBod{animation:sqUp 2.2s ease-in-out infinite}</style><g class="sqBod"><circle class="h" cx="140" cy="28" r="11"/><line class="s" x1="140" y1="39" x2="140" y2="80"/><line class="s" x1="117" y1="52" x2="163" y2="52"/><line class="s" x1="117" y1="52" x2="110" y2="66"/><line class="s" x1="163" y1="52" x2="170" y2="66"/><rect class="e" x="112" y="60" width="56" height="10" rx="2"/></g><line class="s" x1="140" y1="80" x2="118" y2="110"/><line class="s" x1="140" y1="80" x2="162" y2="110"/><line class="s" x1="118" y1="110" x2="112" y2="150"/><line class="s" x1="162" y1="110" x2="168" y2="150"/></svg>`
+    },
+    "Dumbell Bench Press": {
+      tips: [
+        "Lie flat on the bench, feet planted firmly on the floor for stability.",
+        "Lower dumbbells to chest level with elbows at about 45 degrees from your torso.",
+        "Press straight up explosively — dumbbells should travel in a straight vertical line.",
+        "Full range of motion every rep — upper arms should dip just below bench level."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes bpPress{0%,100%{transform:rotate(0deg)}50%{transform:rotate(38deg)}}.bpArmL{animation:bpPress 2s ease-in-out infinite;transform-origin:105px 100px}.bpArmR{animation:bpPress 2s ease-in-out infinite;transform-origin:175px 100px}</style><rect class="e" x="44" y="120" width="192" height="8" rx="2" opacity=".3"/><circle class="h" cx="230" cy="108" r="10"/><line class="s" x1="220" y1="112" x2="82" y2="112"/><line class="s" x1="82" y1="112" x2="66" y2="132"/><line class="s" x1="66" y1="132" x2="50" y2="132"/><line class="s" x1="220" y1="114" x2="218" y2="132"/><g class="bpArmL"><line class="s" x1="105" y1="100" x2="95" y2="72"/><rect class="e" x="83" y="65" width="15" height="9" rx="2"/></g><g class="bpArmR"><line class="s" x1="175" y1="100" x2="185" y2="72"/><rect class="e" x="182" y="65" width="15" height="9" rx="2"/></g></svg>`
+    },
+    "Single-Arm DB Row": {
+      tips: [
+        "Brace one hand and same-side knee on the bench; back flat, parallel to the floor.",
+        "Let the dumbbell hang at full arm extension — get a complete stretch at the bottom.",
+        "Row by driving your elbow up toward your hip, not out toward your shoulder.",
+        "Pause at the top squeezing your shoulder blade inward, then lower with full control."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes rowPull{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-58deg)}}.rowArm{animation:rowPull 2s ease-in-out infinite;transform-origin:108px 98px}</style><rect class="e" x="118" y="116" width="90" height="8" rx="2" opacity=".3"/><circle class="h" cx="208" cy="82" r="10"/><line class="s" x1="198" y1="86" x2="108" y2="98"/><line class="s" x1="198" y1="89" x2="194" y2="118"/><line class="s" x1="194" y1="118" x2="182" y2="150"/><line class="s" x1="108" y1="98" x2="100" y2="126"/><line class="s" x1="100" y1="126" x2="92" y2="150"/><line class="s" x1="158" y1="93" x2="150" y2="116"/><line class="s" x1="150" y1="116" x2="142" y2="140"/><g class="rowArm"><line class="s" x1="108" y1="98" x2="92" y2="130"/><rect class="e" x="83" y="126" width="14" height="8" rx="2"/></g></svg>`
+    },
+    "Dumbbell Shoulder Press": {
+      tips: [
+        "Sit upright or stand tall — do not lean back as the dumbbells go overhead.",
+        "Start with dumbbells at shoulder height, palms facing forward.",
+        "Press directly overhead until arms fully lock out — squeeze hard at the top.",
+        "Lower slowly to shoulder height with control — the descent is just as important."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes spLeft{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-58deg)}}@keyframes spRight{0%,100%{transform:rotate(0deg)}50%{transform:rotate(58deg)}}.spAL{animation:spLeft 2.2s ease-in-out infinite;transform-origin:116px 60px}.spAR{animation:spRight 2.2s ease-in-out infinite;transform-origin:164px 60px}</style><circle class="h" cx="140" cy="26" r="11"/><line class="s" x1="140" y1="37" x2="140" y2="96"/><line class="s" x1="116" y1="60" x2="164" y2="60"/><line class="s" x1="140" y1="96" x2="126" y2="142"/><line class="s" x1="140" y1="96" x2="154" y2="142"/><g class="spAL"><line class="s" x1="116" y1="60" x2="94" y2="44"/><rect class="e" x="81" y="38" width="16" height="8" rx="2"/></g><g class="spAR"><line class="s" x1="164" y1="60" x2="186" y2="44"/><rect class="e" x="183" y="38" width="16" height="8" rx="2"/></g></svg>`
+    },
+    "Dumbbell Curl": {
+      tips: [
+        "Stand tall, dumbbells at your sides with palms facing forward.",
+        "Curl by bending at the elbow — upper arms stay pinned to your sides throughout.",
+        "No swinging or using momentum — if you need to swing, the weight is too heavy.",
+        "Lower all the way down to full extension to get the complete stretch each rep."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes curlL{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-100deg)}}@keyframes curlR{0%,100%{transform:rotate(0deg)}50%{transform:rotate(100deg)}}.cFL{animation:curlL 2s ease-in-out infinite;transform-origin:102px 98px}.cFR{animation:curlR 2s ease-in-out infinite;transform-origin:178px 98px}</style><circle class="h" cx="140" cy="26" r="11"/><line class="s" x1="140" y1="37" x2="140" y2="96"/><line class="s" x1="116" y1="56" x2="164" y2="56"/><line class="s" x1="116" y1="56" x2="102" y2="98"/><line class="s" x1="164" y1="56" x2="178" y2="98"/><line class="s" x1="140" y1="96" x2="126" y2="140"/><line class="s" x1="140" y1="96" x2="154" y2="140"/><g class="cFL"><line class="s" x1="102" y1="98" x2="96" y2="134"/><rect class="e" x="87" y="129" width="14" height="8" rx="2"/></g><g class="cFR"><line class="s" x1="178" y1="98" x2="184" y2="134"/><rect class="e" x="179" y="129" width="14" height="8" rx="2"/></g></svg>`
+    },
+    "Plank": {
+      tips: [
+        "Form a straight line from head to heels — hips neither sagging nor raised.",
+        "Elbows directly below shoulders, forearms flat on the ground.",
+        "Brace your core as if bracing for a punch — breathe steadily throughout.",
+        "Squeeze your glutes and quads; the whole body should feel like one rigid plank."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}@keyframes plankBreath{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}.plBod{animation:plankBreath 3s ease-in-out infinite}</style><line class="s" x1="28" y1="150" x2="252" y2="150"/><g class="plBod"><circle class="h" cx="228" cy="104" r="10"/><line class="s" x1="218" y1="108" x2="84" y2="108"/><line class="s" x1="84" y1="108" x2="80" y2="150"/><line class="s" x1="218" y1="110" x2="215" y2="150"/><line class="s" x1="150" y1="108" x2="145" y2="150"/><line class="s" x1="193" y1="108" x2="196" y2="136"/><line class="s" x1="196" y1="136" x2="215" y2="150"/></g></svg>`
+    },
+    "Romanian Deadlift": {
+      tips: [
+        "Start standing, dumbbells in front of thighs, palms facing your legs.",
+        "Push your hips BACK — this is a hip hinge, not a squat; knees stay soft.",
+        "Keep the dumbbells close to your legs and your back flat throughout.",
+        "Drive your hips forward to stand — feel the hamstrings load and release."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes rdlHinge{0%,100%{transform:rotate(0deg)}50%{transform:rotate(56deg)}}.rdlTop{animation:rdlHinge 2.4s ease-in-out infinite;transform-origin:148px 108px}</style><line class="s" x1="40" y1="158" x2="240" y2="158"/><g class="rdlTop"><circle class="h" cx="148" cy="40" r="11"/><line class="s" x1="148" y1="51" x2="148" y2="108"/><line class="s" x1="125" y1="68" x2="107" y2="84"/><rect class="e" x="97" y="79" width="14" height="8" rx="2"/><line class="s" x1="171" y1="68" x2="189" y2="84"/><rect class="e" x="185" y="79" width="14" height="8" rx="2"/></g><line class="s" x1="148" y1="108" x2="140" y2="144"/><line class="s" x1="148" y1="108" x2="156" y2="144"/><line class="s" x1="140" y1="144" x2="133" y2="158"/><line class="s" x1="156" y1="144" x2="163" y2="158"/></svg>`
+    },
+    "Pull-Ups": {
+      tips: [
+        "Grip slightly wider than shoulder-width, palms facing away from you.",
+        "Begin every rep from a dead hang — full arm extension, no shortcuts.",
+        "Pull your chest toward the bar, driving elbows down and back.",
+        "Lower yourself fully under control — the negative builds as much strength as the pull."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes pullUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-40px)}}.puBod{animation:pullUp 2.2s ease-in-out infinite}</style><rect x="55" y="12" width="170" height="8" rx="2" fill="#c8441a" opacity=".5"/><line class="s" x1="108" y1="20" x2="108" y2="44"/><line class="s" x1="172" y1="20" x2="172" y2="44"/><g class="puBod"><circle class="h" cx="140" cy="56" r="11"/><line class="s" x1="140" y1="67" x2="140" y2="110"/><line class="s" x1="117" y1="44" x2="117" y2="76"/><line class="s" x1="163" y1="44" x2="163" y2="76"/><line class="s" x1="117" y1="76" x2="140" y2="70"/><line class="s" x1="163" y1="76" x2="140" y2="70"/><line class="s" x1="140" y1="110" x2="128" y2="150"/><line class="s" x1="140" y1="110" x2="152" y2="150"/></g></svg>`
+    },
+    "Dumbbell Reverse Lunge": {
+      tips: [
+        "Step one foot BACK — lower your back knee toward the floor.",
+        "Front shin stays vertical; front thigh reaches parallel to the floor.",
+        "Torso upright throughout — do not lean forward over the front knee.",
+        "Push through your front heel to return; keep dumbbells at your sides."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes rlDrop{0%,100%{transform:translateY(0)}50%{transform:translateY(16px)}}.rlBod{animation:rlDrop 2.2s ease-in-out infinite}</style><line class="s" x1="40" y1="162" x2="240" y2="162"/><g class="rlBod"><circle class="h" cx="148" cy="28" r="11"/><line class="s" x1="148" y1="39" x2="148" y2="96"/><line class="s" x1="125" y1="58" x2="109" y2="76"/><rect class="e" x="99" y="70" width="14" height="8" rx="2"/><line class="s" x1="171" y1="58" x2="187" y2="76"/><rect class="e" x="183" y="70" width="14" height="8" rx="2"/><line class="s" x1="148" y1="96" x2="163" y2="130"/><line class="s" x1="163" y1="130" x2="168" y2="162"/><line class="s" x1="148" y1="96" x2="116" y2="124"/><line class="s" x1="116" y1="124" x2="120" y2="162"/></g></svg>`
+    },
+    "Dumbbell Bent-Over Row": {
+      tips: [
+        "Hinge forward until torso is nearly parallel to the floor; brace your core hard.",
+        "Dumbbells hang directly below your shoulders at the bottom of each rep.",
+        "Drive both elbows up and back toward your hips — shoulder blades squeeze together.",
+        "Keep your back flat the entire set — the moment it rounds, reduce the weight."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes borRow{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-55deg)}}.borAL{animation:borRow 1.9s ease-in-out infinite;transform-origin:130px 100px}.borAR{animation:borRow 1.9s ease-in-out infinite;transform-origin:162px 98px}</style><circle class="h" cx="210" cy="82" r="10"/><line class="s" x1="200" y1="86" x2="86" y2="100"/><line class="s" x1="200" y1="89" x2="194" y2="120"/><line class="s" x1="194" y1="120" x2="186" y2="155"/><line class="s" x1="86" y1="100" x2="79" y2="130"/><line class="s" x1="79" y1="130" x2="72" y2="155"/><g class="borAL"><line class="s" x1="130" y1="100" x2="118" y2="130"/><rect class="e" x="109" y="126" width="14" height="8" rx="2"/></g><g class="borAR"><line class="s" x1="162" y1="98" x2="152" y2="126"/><rect class="e" x="143" y="122" width="14" height="8" rx="2"/></g></svg>`
+    },
+    "Tricep Kickbacks": {
+      tips: [
+        "Hinge forward, upper arm pinned parallel to your torso — it must not move.",
+        "Start with forearm hanging straight down at 90 degrees from the upper arm.",
+        "Extend back until the arm is fully straight; squeeze the tricep hard at lockout.",
+        "Control the return — do not let the weight swing your forearm back down."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes tkKick{0%,100%{transform:rotate(88deg)}50%{transform:rotate(0deg)}}.tkFA{animation:tkKick 2s ease-in-out infinite;transform-origin:126px 104px}</style><circle class="h" cx="210" cy="82" r="10"/><line class="s" x1="200" y1="86" x2="86" y2="100"/><line class="s" x1="200" y1="89" x2="194" y2="120"/><line class="s" x1="194" y1="120" x2="186" y2="155"/><line class="s" x1="86" y1="100" x2="79" y2="130"/><line class="s" x1="79" y1="130" x2="72" y2="155"/><line class="s" x1="164" y1="97" x2="126" y2="104"/><g class="tkFA"><line class="s" x1="126" y1="104" x2="148" y2="104"/><rect class="e" x="144" y="98" width="14" height="8" rx="2"/></g></svg>`
+    },
+    "Dead Hang": {
+      tips: [
+        "Full grip — thumb wraps around the bar; never use a thumbless grip on a dead hang.",
+        "Let your shoulders rise toward your ears for a passive hang that decompresses the spine.",
+        "Progress to an active hang: pull shoulder blades down without bending your arms.",
+        "Breathe deeply and steadily; treat this as a mobility and grip drill."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}@keyframes dhSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}.dhBod{animation:dhSway 3s ease-in-out infinite;transform-origin:140px 20px}</style><rect x="55" y="12" width="170" height="8" rx="2" fill="#c8441a" opacity=".5"/><line class="s" x1="108" y1="20" x2="108" y2="40"/><line class="s" x1="172" y1="20" x2="172" y2="40"/><g class="dhBod"><circle class="h" cx="140" cy="52" r="11"/><line class="s" x1="140" y1="63" x2="140" y2="110"/><line class="s" x1="117" y1="40" x2="117" y2="74"/><line class="s" x1="163" y1="40" x2="163" y2="74"/><line class="s" x1="117" y1="74" x2="140" y2="68"/><line class="s" x1="163" y1="74" x2="140" y2="68"/><line class="s" x1="140" y1="110" x2="128" y2="148"/><line class="s" x1="140" y1="110" x2="152" y2="148"/><line class="s" x1="128" y1="148" x2="124" y2="162"/><line class="s" x1="152" y1="148" x2="156" y2="162"/></g></svg>`
+    },
+    "DB Thruster (Squat to Press)": {
+      tips: [
+        "It is one fluid movement: use the drive out of the squat to fuel the press overhead.",
+        "The moment your hips reach full extension, the press should already be moving.",
+        "Lock arms out fully overhead at the top before descending for the next rep.",
+        "Control the dumbbells back to shoulder height as you sink into the next squat."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes thRise{0%,100%{transform:translateY(18px)}50%{transform:translateY(-8px)}}@keyframes thArmL{0%,100%{transform:rotate(50deg)}50%{transform:rotate(-55deg)}}@keyframes thArmR{0%,100%{transform:rotate(-50deg)}50%{transform:rotate(55deg)}}.thBod{animation:thRise 2.2s ease-in-out infinite}.thAL{animation:thArmL 2.2s ease-in-out infinite;transform-origin:116px 60px}.thAR{animation:thArmR 2.2s ease-in-out infinite;transform-origin:164px 60px}</style><g class="thBod"><circle class="h" cx="140" cy="26" r="11"/><line class="s" x1="140" y1="37" x2="140" y2="88"/><line class="s" x1="116" y1="60" x2="164" y2="60"/><line class="s" x1="140" y1="88" x2="122" y2="124"/><line class="s" x1="140" y1="88" x2="158" y2="124"/><line class="s" x1="122" y1="124" x2="116" y2="152"/><line class="s" x1="158" y1="124" x2="164" y2="152"/><g class="thAL"><line class="s" x1="116" y1="60" x2="96" y2="44"/><rect class="e" x="83" y="38" width="16" height="8" rx="2"/></g><g class="thAR"><line class="s" x1="164" y1="60" x2="184" y2="44"/><rect class="e" x="181" y="38" width="16" height="8" rx="2"/></g></g></svg>`
+    },
+    "DB Step-Up (Bench)": {
+      tips: [
+        "Place your entire foot on the bench — not just your toes.",
+        "Drive through the heel of the elevated foot; do not push off the ground foot.",
+        "Stand fully upright at the top — hips and knee completely extended.",
+        "Keep dumbbells at your sides and torso tall; do not lean forward into the step."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes suRise{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}.suBod{animation:suRise 2.2s ease-in-out infinite}</style><rect class="e" x="100" y="130" width="110" height="16" rx="2" opacity=".3"/><line class="s" x1="40" y1="162" x2="240" y2="162"/><g class="suBod"><circle class="h" cx="148" cy="30" r="11"/><line class="s" x1="148" y1="41" x2="148" y2="96"/><line class="s" x1="125" y1="60" x2="109" y2="78"/><rect class="e" x="99" y="72" width="14" height="8" rx="2"/><line class="s" x1="171" y1="60" x2="187" y2="78"/><rect class="e" x="183" y="72" width="14" height="8" rx="2"/><line class="s" x1="148" y1="96" x2="160" y2="130"/><line class="s" x1="160" y1="130" x2="164" y2="146"/><line class="s" x1="148" y1="96" x2="130" y2="130"/><line class="s" x1="130" y1="130" x2="116" y2="162"/></g></svg>`
+    },
+    "Dumbbell Lateral Raise": {
+      tips: [
+        "Maintain a slight bend in the elbows throughout — never raise with straight locked arms.",
+        "Lead with your elbows, not your hands — think of pouring a jug of water out to the side.",
+        "Stop at shoulder height; going higher shifts the load off the deltoid.",
+        "Lower slowly over three full seconds — the negative is where the muscle is built."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes lrLeft{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-72deg)}}@keyframes lrRight{0%,100%{transform:rotate(0deg)}50%{transform:rotate(72deg)}}.lrAL{animation:lrLeft 2s ease-in-out infinite;transform-origin:116px 56px}.lrAR{animation:lrRight 2s ease-in-out infinite;transform-origin:164px 56px}</style><circle class="h" cx="140" cy="26" r="11"/><line class="s" x1="140" y1="37" x2="140" y2="98"/><line class="s" x1="116" y1="56" x2="164" y2="56"/><line class="s" x1="140" y1="98" x2="126" y2="142"/><line class="s" x1="140" y1="98" x2="154" y2="142"/><g class="lrAL"><line class="s" x1="116" y1="56" x2="91" y2="68"/><rect class="e" x="77" y="63" width="16" height="8" rx="2"/></g><g class="lrAR"><line class="s" x1="164" y1="56" x2="189" y2="68"/><rect class="e" x="187" y="63" width="16" height="8" rx="2"/></g></svg>`
+    },
+    "DB Hammer Curl": {
+      tips: [
+        "Neutral grip throughout — palms face each other, thumbs pointing up.",
+        "Elbows stay pinned to your sides the whole set — only your forearms move.",
+        "The hammer grip targets the brachialis and forearms more than a standard curl.",
+        "Can be performed alternating or simultaneously — both are equally effective."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}.e{fill:#c8441a;opacity:.8}@keyframes hcLeft{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-96deg)}}@keyframes hcRight{0%,100%{transform:rotate(0deg)}50%{transform:rotate(96deg)}}.hcFL{animation:hcLeft 2s ease-in-out infinite;transform-origin:103px 98px}.hcFR{animation:hcRight 2s ease-in-out infinite;transform-origin:177px 98px}</style><circle class="h" cx="140" cy="26" r="11"/><line class="s" x1="140" y1="37" x2="140" y2="96"/><line class="s" x1="116" y1="56" x2="164" y2="56"/><line class="s" x1="116" y1="56" x2="103" y2="98"/><line class="s" x1="164" y1="56" x2="177" y2="98"/><line class="s" x1="140" y1="96" x2="124" y2="142"/><line class="s" x1="140" y1="96" x2="156" y2="142"/><g class="hcFL"><line class="s" x1="103" y1="98" x2="97" y2="134"/><line class="s" x1="97" y1="134" x2="90" y2="142"/><line class="s" x1="97" y1="134" x2="104" y2="142"/></g><g class="hcFR"><line class="s" x1="177" y1="98" x2="183" y2="134"/><line class="s" x1="183" y1="134" x2="176" y2="142"/><line class="s" x1="183" y1="134" x2="190" y2="142"/></g></svg>`
+    },
+    "Mountain Climbers": {
+      tips: [
+        "Start in a high plank — hands under shoulders, body in a perfectly straight line.",
+        "Drive one knee toward your chest explosively while hips stay level — do not bounce.",
+        "Slow mountain climbers are a core exercise; fast ones become cardio — both are valid.",
+        "The moment your hips rise or sag, stop, reset your plank, and continue."
+      ],
+      anim: `<svg viewBox="0 0 280 170" xmlns="http://www.w3.org/2000/svg"><style>.s{fill:none;stroke:#e0dbd4;stroke-width:3;stroke-linecap:round}.h{fill:#e0dbd4}@keyframes mcFront{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-58deg)}}@keyframes mcBack{0%,100%{transform:rotate(-58deg)}50%{transform:rotate(0deg)}}.mcKF{animation:mcFront 0.9s ease-in-out infinite;transform-origin:165px 110px}.mcKB{animation:mcBack 0.9s ease-in-out infinite;transform-origin:118px 110px}</style><line class="s" x1="28" y1="158" x2="252" y2="158"/><circle class="h" cx="228" cy="98" r="10"/><line class="s" x1="218" y1="102" x2="82" y2="110"/><line class="s" x1="218" y1="105" x2="222" y2="140"/><line class="s" x1="222" y1="140" x2="226" y2="158"/><line class="s" x1="82" y1="110" x2="74" y2="140"/><line class="s" x1="74" y1="140" x2="68" y2="158"/><g class="mcKF"><line class="s" x1="165" y1="110" x2="152" y2="138"/><line class="s" x1="152" y1="138" x2="158" y2="158"/></g><g class="mcKB"><line class="s" x1="118" y1="110" x2="108" y2="138"/><line class="s" x1="108" y1="138" x2="114" y2="158"/></g></svg>`
+    },
+  };
 
-  const formModalOverlay = document.getElementById('form-modal-overlay');
+  // FORM MODAL LOGIC
+  const formOverlay = document.getElementById('form-modal-overlay');
   document.getElementById('form-modal-close').addEventListener('click', () => {
-    formModalOverlay.classList.remove('visible');
+    formOverlay.classList.remove('visible');
   });
-  formModalOverlay.addEventListener('click', (e) => {
-    if (e.target === formModalOverlay) formModalOverlay.classList.remove('visible');
+  formOverlay.addEventListener('click', (e) => {
+    if (e.target === formOverlay) formOverlay.classList.remove('visible');
   });
 
-  async function fetchFormGuide(exerciseName) {
-    if (formGuideCache[exerciseName]) return formGuideCache[exerciseName];
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        system: "You are a fitness coach. Respond ONLY with a valid JSON object, no markdown, no backticks, no explanation. The JSON must have exactly two fields: \"tips\" (array of exactly 4 short strings, each under 120 characters, giving the most important form cues for the exercise) and \"cue\" (one single sentence, under 80 characters, that is the single most important thing to remember — the \"golden rule\" of the exercise). Be specific, practical, and coach-like.",
-        messages: [{
-          role: "user",
-          content: `Give me the form guide for: ${exerciseName}`
-        }]
-      })
-    });
-
-    const data = await response.json();
-    const text = data.content[0].text.trim();
-    const parsed = JSON.parse(text);
-    formGuideCache[exerciseName] = parsed;
-    return parsed;
-  }
-
-  document.addEventListener('click', async (e) => {
-    if (!e.target.classList.contains('form-guide-btn')) return;
+  // Capture phase so this fires before the chart click listener
+  document.addEventListener('click', (e) => {
+    if (!e.target.dataset.form) return;
     e.stopPropagation();
-    e.preventDefault();
-    const name = e.target.dataset.name;
-
+    const name = e.target.dataset.form;
+    const guide = FORM_GUIDES[name];
+    if (!guide) return;
     document.getElementById('form-modal-title').textContent = name;
-    document.getElementById('form-anim-stage').style.display = 'none';
-    document.getElementById('form-tips-list').innerHTML = '<li style="color:var(--muted);font-style:italic;">Loading form guide…</li>';
-    document.getElementById('form-golden-rule').style.display = 'none';
-    formModalOverlay.classList.add('visible');
-
-    try {
-      const guide = await fetchFormGuide(name);
-      document.getElementById('form-tips-list').innerHTML = guide.tips.map(t => `<li>${t}</li>`).join('');
-      const ruleEl = document.getElementById('form-golden-rule');
-      ruleEl.textContent = '✦ ' + guide.cue;
-      ruleEl.style.display = 'block';
-    } catch (err) {
-      document.getElementById('form-tips-list').innerHTML = '<li style="color:var(--rust);">Could not load form guide — check your connection.</li>';
-      console.error(err);
-    }
-  }, true); // useCapture:true so this fires BEFORE the chart listener
-
+    document.getElementById('form-anim-stage').innerHTML = guide.anim;
+    document.getElementById('form-tips-list').innerHTML =
+      guide.tips.map(t => '<li>' + t + '</li>').join('');
+    formOverlay.classList.add('visible');
+  }, true);
 
 </script>
 
